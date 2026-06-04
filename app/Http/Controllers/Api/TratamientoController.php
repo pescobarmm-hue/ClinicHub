@@ -1,24 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Cita;
+use App\Http\Controllers\Controller;
+use App\Models\Tratamiento;
 use Illuminate\Http\Request;
 
-class CitaController extends Controller
+class TratamientoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
     {
         //
     }
@@ -34,15 +27,7 @@ class CitaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Cita $cita)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Cita $cita)
+    public function show(Tratamiento $tratamiento)
     {
         //
     }
@@ -50,7 +35,7 @@ class CitaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Cita $cita)
+    public function update(Request $request, Tratamiento $tratamiento)
     {
         //
     }
@@ -58,7 +43,7 @@ class CitaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Cita $cita)
+    public function destroy(Tratamiento $tratamiento)
     {
         //
     }
