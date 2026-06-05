@@ -95,6 +95,13 @@
     <div class="w-full max-w-5xl my-auto rounded-3xl overflow-hidden shadow-2xl border border-white/5 animate-fade-in z-10">
         <div class="flex flex-col lg:flex-row">
 
+            <!-- Botón volver -->
+    <div class="absolute top-5 left-5 md:top-7 md:left-7 z-50">
+        <a href="{{ route('home') }}" class="btn-return flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium text-gray-300 shadow-lg transition-all">
+            <i class="fa-solid fa-arrow-left text-[11px]"></i>
+            <span>Volver al inicio</span>
+        </a>
+    </div>s
             <div class="w-full lg:w-1/2 bg-gradient-to-br from-slate-950/90 via-slate-900/80 to-indigo-950/40 p-8 md:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/5 backdrop-blur-sm">
                 <div>
                     <div class="flex items-center gap-3 mb-10">

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('password');
 
             // Social Login
-            $table->string('google_id')->nullable();
-            $table->string('github_id')->nullable();
+            $table->string('google_id')->nullable()->unique();
+            $table->string('github_id')->nullable()->unique();
             $table->string('avatar')->nullable();
 
             $table->rememberToken();
