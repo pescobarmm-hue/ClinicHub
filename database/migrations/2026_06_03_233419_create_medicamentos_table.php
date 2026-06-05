@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('duracion');
 
             //Relaciones
-            $table->foreignId('tratamiendo_id')->constrained('tratamientos')->onDelete('cascade');
+            $table->foreignId('tratamiento_id')->constrained('tratamientos')->onDelete('cascade');
 
             $table->string('proveedor')->nullable();
             $table->text('efectos_secundarios')->nullable();
