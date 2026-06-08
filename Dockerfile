@@ -6,7 +6,7 @@ RUN apk add --no-cache nginx wget mariadb-client postgresql-dev libpng-dev libjp
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql gd zip
 
 # Instalar Composer para gestionar dependencias de Laravel
-RUN curl -sS https://getcomposer.org | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 COPY . .
