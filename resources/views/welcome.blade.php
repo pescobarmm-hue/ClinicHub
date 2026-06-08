@@ -1400,48 +1400,191 @@
     </footer>
 
     <!-- ===========================
-         MODAL DEMO INTERACTIVO
+     MODAL DEMO PROFESIONAL - ZOOM + ARRASTRE SIN ERRORES (MASTER LEVEL)
     =========================== -->
-    <div x-show="showDemo" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" x-transition>
-        <div class="modal-glass rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden" @click.outside="showDemo = false">
-            <div class="flex justify-between items-center p-6 border-b border-slate-200 bg-linear-to-r from-blue-50 to-indigo-50">
-                <div>
-                    <h3 class="text-2xl font-black text-slate-900">Demo Interactiva</h3>
-                    <p class="text-sm text-slate-500 font-medium mt-0.5">Vista previa del sistema ClinicHub Premium</p>
-                </div>
-                <button @click="showDemo = false" class="h-9 w-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 transition text-lg font-bold">✕</button>
-            </div>
-            <div class="p-6 overflow-y-auto max-h-[70vh]">
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    <template x-for="(demo, idx) in demoItems" :key="idx">
-                        <div class="cursor-pointer group" @click="demoActive = idx">
-                            <div class="aspect-video rounded-2xl flex items-center justify-center text-white transition-all duration-200 group-hover:scale-105 shadow-md"
-                                 :class="[demo.gradient, demoActive === idx ? 'ring-4 ring-offset-2 ' + demo.ring : '']">
-                                <i :class="demo.icon + ' text-3xl'"></i>
-                            </div>
-                            <p class="text-center text-xs font-bold mt-2 transition" :class="demoActive === idx ? demo.textColor : 'text-slate-500'" x-text="demo.label"></p>
-                        </div>
-                    </template>
-                </div>
+<div x-show="showDemo"
+     x-cloak
+     class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+     style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);"
+     x-transition.opacity.duration.300
+     @wheel.prevent
+     @touchmove.prevent>
 
-                <div class="bg-linear-to-br from-slate-50 to-blue-50/40 rounded-2xl p-8 text-center border border-slate-200">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden"
+         @click.outside="showDemo = false"
+         @wheel.stop
+         @touchmove.stop
+         x-transition.scale.300">
+
+        <!-- Header fijo -->
+        <div class="flex justify-between items-center p-5 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                    <i class="fa-solid fa-display text-white text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">Demo Interactiva</h3>
+                    <p class="text-xs text-slate-500 font-medium">Vista previa del sistema ClinicHub Premium</p>
+                </div>
+            </div>
+            <button @click="showDemo = false" class="h-9 w-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 transition text-lg font-bold">
+                ✕
+            </button>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="flex flex-1 overflow-hidden">
+
+            <!-- Sidebar miniaturas -->
+            <div class="w-72 border-r border-slate-200 bg-slate-50/50 flex flex-col shrink-0">
+                <div class="p-4 border-b border-slate-200">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-grid-2 text-xs"></i> MÓDULOS DISPONIBLES
+                    </p>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3 space-y-2">
                     <template x-for="(demo, idx) in demoItems" :key="idx">
-                        <div x-show="demoActive === idx" x-transition>
-                            <div class="h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-5 text-white shadow-lg"
-                                 :class="demo.gradient">
-                                <i :class="demo.icon + ' text-2xl'"></i>
+                        <div @click="demoActive = idx"
+                             class="cursor-pointer p-3 rounded-xl transition-all duration-200"
+                             :class="demoActive === idx ? 'bg-white shadow-md border border-blue-200' : 'hover:bg-white/60'">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                                     :class="demoActive === idx ? demo.gradient : 'bg-slate-100'">
+                                    <i :class="demo.icon" :class="demoActive === idx ? 'text-white' : 'text-slate-500'"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-bold text-sm truncate" :class="demoActive === idx ? 'text-blue-600' : 'text-slate-700'" x-text="demo.label"></p>
+                                    <p class="text-[10px] text-slate-400 truncate" x-text="demo.title.split(' ').slice(0,2).join(' ')"></p>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-300" x-show="demoActive !== idx"></i>
+                                <i class="fa-solid fa-check text-blue-500 text-xs" x-show="demoActive === idx"></i>
                             </div>
-                            <h4 class="text-xl font-extrabold text-slate-900" x-text="demo.title"></h4>
-                            <p class="text-slate-600 mt-2 font-medium" x-text="demo.desc"></p>
-                            <a :href="demo.link" class="inline-flex items-center gap-2 mt-6 bg-linear-to-r from-blue-600 to-indigo-600 text-white font-bold px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-lg shadow-blue-500/30">
-                                Acceder al módulo <i class="fa-solid fa-arrow-right text-sm"></i>
-                            </a>
                         </div>
                     </template>
                 </div>
+            </div>
+
+            <!-- Área de vista previa CON ZOOM + ARRASTRE MASTER -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <template x-for="(demo, idx) in demoItems" :key="idx">
+                    <div x-show="demoActive === idx" x-transition class="flex-1 flex flex-col overflow-hidden">
+
+                        <!-- Título y descripción -->
+                        <div class="p-5 pb-0 shrink-0">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <div>
+                                    <h4 class="text-2xl font-extrabold text-slate-900" x-text="demo.title"></h4>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">
+                                            <i class="fa-regular fa-eye mr-1"></i> Vista previa
+                                        </span>
+                                        <span class="text-xs text-slate-400" x-text="demo.desc.substring(0, 60) + '...'"></span>
+                                    </div>
+                                </div>
+                                <a :href="demo.link" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-md flex items-center gap-2 shrink-0">
+                                    <i class="fa-solid fa-arrow-right"></i> Acceder
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor de imagen con ZOOM + ARRASTRE PROFESIONAL -->
+                        <div class="flex-1 p-5 overflow-hidden select-none"
+                             x-data="{
+                                zoomLevel: 100,
+                                panX: 0,
+                                panY: 0,
+                                isDragging: false,
+                                startX: 0,
+                                startY: 0,
+                                startPanX: 0,
+                                startPanY: 0,
+                                constraints: { minX: -500, maxX: 500, minY: -500, maxY: 500 }
+                             }"
+                             x-effect="() => {
+                                const img = $el.querySelector('.zoom-img');
+                                if (img) {
+                                    const scale = zoomLevel / 100;
+                                    img.style.transform = `scale(${scale}) translate(${panX / scale}px, ${panY / scale}px)`;
+                                    img.style.transition = isDragging ? 'none' : 'transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+                                }
+                                const zoomDisplay = $el.querySelector('.zoom-value-display');
+                                if (zoomDisplay) zoomDisplay.textContent = zoomLevel + '%';
+                             }">
+
+                            <div class="relative bg-slate-100 rounded-2xl border border-slate-200 h-full flex flex-col overflow-hidden">
+
+                                <!-- Barra de zoom superior -->
+                                <div class="absolute top-3 left-3 right-3 z-20 bg-white/95 backdrop-blur rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
+                                    <i class="fa-solid fa-magnifying-glass-minus text-slate-400 text-sm"></i>
+                                    <input type="range"
+                                           min="25"
+                                           max="300"
+                                           x-model="zoomLevel"
+                                           @input="if(zoomLevel === 100) { panX = 0; panY = 0 }"
+                                           class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                    <i class="fa-solid fa-magnifying-glass-plus text-slate-400 text-sm"></i>
+                                    <span class="text-sm font-bold text-blue-600 w-14 text-center zoom-value-display">100%</span>
+                                    <div class="w-px h-5 bg-slate-200"></div>
+                                    <button @click="zoomLevel = 100; panX = 0; panY = 0" class="text-slate-500 hover:text-blue-600 transition text-sm font-semibold px-2 py-1 rounded-lg hover:bg-slate-100">
+                                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                                    </button>
+                                </div>
+
+                                <!-- Contenedor de imagen con ARRASTRE (SIN selección azul) -->
+                                <div class="flex-1 overflow-hidden rounded-2xl relative"
+                                     @mousedown.prevent="if(zoomLevel > 100) { isDragging = true; startX = $event.clientX; startY = $event.clientY; startPanX = panX; startPanY = panY; $event.preventDefault() }"
+                                     @mousemove.prevent="if(isDragging && zoomLevel > 100) {
+                                         let deltaX = ($event.clientX - startX);
+                                         let deltaY = ($event.clientY - startY);
+                                         panX = startPanX + deltaX;
+                                         panY = startPanY + deltaY;
+                                         $event.preventDefault()
+                                     }"
+                                     @mouseup.prevent="isDragging = false; $event.preventDefault()"
+                                     @mouseleave.prevent="isDragging = false"
+                                     :style="'user-select: none; -webkit-user-select: none;'">
+
+                                    <div class="w-full h-full overflow-auto cursor-grab"
+                                         :class="isDragging ? 'cursor-grabbing' : (zoomLevel > 100 ? 'cursor-grab' : 'cursor-default')">
+                                        <div class="flex items-center justify-center min-h-[400px] p-8">
+                                            <img :src="demo.imageUrl"
+                                                 :alt="demo.label"
+                                                 class="zoom-img max-w-full rounded-xl shadow-lg pointer-events-none select-none"
+                                                 draggable="false"
+                                                 style="transform-origin: center center; user-select: none; -webkit-user-drag: none;">
+                                        </div>
+                                    </div>
+
+                                    <!-- Badge zoom activo -->
+                                    <div x-show="zoomLevel > 100"
+                                         class="absolute bottom-3 left-3 bg-black/70 text-white text-[11px] px-3 py-1.5 rounded-full backdrop-blur-sm flex items-center gap-2 font-medium shadow-lg z-10">
+                                        <i class="fa-solid fa-arrows-up-down-left-right text-blue-400 text-xs"></i>
+                                        <span>Arrastra para mover la imagen</span>
+                                    </div>
+                                </div>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-slate-200 p-3 bg-slate-50/80 shrink-0 flex justify-between items-center text-xs text-slate-400">
+            <div class="flex gap-4">
+                <span><i class="fa-regular fa-keyboard"></i> ESC → Cerrar</span>
+                <span><i class="fa-regular fa-mouse"></i> Scroll aislado en el modal</span>
+                <span><i class="fa-regular fa-hand-peace"></i> Arrastre suave sin selección</span>
+            </div>
+            <div class="flex gap-3">
+                <span class="flex items-center gap-1"><i class="fa-regular fa-image text-blue-500"></i> <span x-text="demoItems.length + ' módulos'"></span></span>
+                <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> Vista previa en tiempo real</span>
             </div>
         </div>
+
     </div>
+</div>
 
     <!-- ===========================
          CHATBOT IA REAL
@@ -1532,6 +1675,7 @@
             activeSection: 'inicio',
             showDemo: false,
             demoActive: 0,
+            isZoomed: false,
             chatOpen: false,
             chatInput: '',
             isTyping: false,
@@ -1556,7 +1700,8 @@
                     label: 'Dashboard',
                     title: 'Dashboard en Tiempo Real',
                     desc: 'Visualiza métricas clave, flujo de pacientes y análisis predictivo con inteligencia artificial.',
-                    link: '/dashboard'
+                    link: '/dashboard',
+                    imageUrl: '/Dashboardclinic.PNG'
                 },
                 {
                     gradient: 'bg-gradient-to-br from-emerald-500 to-teal-600',
@@ -1566,7 +1711,8 @@
                     label: 'Citas',
                     title: 'Calendario Interactivo de Citas',
                     desc: 'Programación avanzada con estados automáticos, asignación de consultorios y recordatorios.',
-                    link: '/citas'
+                    link: '/citas',
+                    imageUrl: '/citas.PNG'
                 },
                 {
                     gradient: 'bg-gradient-to-br from-purple-500 to-pink-600',
@@ -1576,7 +1722,8 @@
                     label: 'Expedientes',
                     title: 'Expediente Electrónico Clínico',
                     desc: 'Historial clínico completo, diagnósticos registrados y seguimiento de tratamientos activos.',
-                    link: '/pacientes'
+                    link: '/pacientes',
+                    imageUrl: '/Pacientes.PNG'
                 },
                 {
                     gradient: 'bg-gradient-to-br from-cyan-500 to-blue-600',
@@ -1586,7 +1733,8 @@
                     label: 'Medicamentos',
                     title: 'Control de Medicamentos',
                     desc: 'Dosificación precisa, control de frecuencias y alertas de efectos secundarios en tiempo real.',
-                    link: '/medicamentos'
+                    link: '/medicamentos',
+                    imageUrl: '/medicamentos.PNG'
                 },
                 {
                     gradient: 'bg-gradient-to-br from-amber-500 to-orange-600',
@@ -1596,7 +1744,8 @@
                     label: 'Médicos',
                     title: 'Gestión del Equipo Médico',
                     desc: 'Especialidades, horarios, rendimiento y métricas por médico en un solo panel.',
-                    link: '/medicos'
+                    link: '/medicos',
+                    imageUrl: '/medicos.PNG'
                 },
                 {
                     gradient: 'bg-gradient-to-br from-rose-500 to-red-600',
@@ -1606,7 +1755,8 @@
                     label: 'Tratamientos',
                     title: 'Seguimiento de Tratamientos',
                     desc: 'Evolución médica vinculada a planes terapéuticos activos con reportes automatizados.',
-                    link: '/tratamientos'
+                    link: '/tratamientos',
+                    imageUrl: '/tratamiento.PNG'
                 },
             ],
 
@@ -1621,6 +1771,13 @@
                 const el = document.getElementById(id);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 this.activeSection = id;
+            },
+
+            resetZoom() {
+                this.isZoomed = false;
+                if (typeof window.resetZoomGlobal === 'function') {
+                    window.resetZoomGlobal();
+                }
             },
 
             // ===== CHATBOT IA REAL =====
@@ -1760,6 +1917,12 @@
             }
         }
     }
+
+        window.resetZoomGlobal = function() {
+        // Función global para resetear zoom desde cualquier lugar
+        const event = new CustomEvent('resetZoom');
+        window.dispatchEvent(event);
+    };
     </script>
 
     <style>
