@@ -23,4 +23,4 @@ COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80
 
 # Comando para limpiar caché y arrancar el servidor web
-CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan migrate --force && nginx -g 'daemon off;'"]
+CMD ["sh", "-c", "php-fpm -D && php artisan config:cache && php artisan route:cache && php artisan migrate --force && nginx -g 'daemon off;'"]
