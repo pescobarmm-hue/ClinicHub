@@ -18,10 +18,13 @@ class Diagnostico extends Model
         'medico_id',
         'gravedad',
         'recomendaciones',
-        'tipo_diagnostico'
+        'tipo_diagnostico',
     ];
 
-    // Relaciones
+    protected $casts = [
+        'fecha' => 'datetime',
+    ];
+
     public function paciente()
     {
         return $this->belongsTo(Paciente::class);

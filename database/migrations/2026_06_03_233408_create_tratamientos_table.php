@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('tratamientos', function (Blueprint $table) {
@@ -15,16 +14,15 @@ return new class extends Migration
             $table->text('descripcion');
             $table->string('duracion');
 
-            //Relaciones
+            // Relaciones
             $table->foreignId('diagnostico_id')->constrained('diagnosticos')->onDelete('cascade');
             $table->foreignId('medico_id')->constrained('medicos')->onDelete('cascade');
 
-            $table->string('estado')->default('Activo'); //Activo, Finalizado, Suspendido
-            $table->string('frecuencia_administracion');
+            $table->string('estado')->default('Activo'); // Activo, Finalizado, Suspendido
+            $table->string('frecuencia_administracion')->nullable(); // <-- FIX: nullable
             $table->timestamps();
         });
     }
-
 
     public function down(): void
     {

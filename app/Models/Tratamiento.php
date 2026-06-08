@@ -18,10 +18,9 @@ class Tratamiento extends Model
         'diagnostico_id',
         'medico_id',
         'estado',
-        'frecuencia_administracion'
+        'frecuencia_administracion',
     ];
 
-    // Relaciones
     public function diagnostico()
     {
         return $this->belongsTo(Diagnostico::class);
@@ -34,6 +33,6 @@ class Tratamiento extends Model
 
     public function medicamentos()
     {
-        return $this->hasMany(Medicamento::class, 'tratamiendo_id');
+        return $this->hasMany(Medicamento::class, 'tratamiento_id');
     }
 }

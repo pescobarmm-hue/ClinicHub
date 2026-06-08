@@ -6,25 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('citas', function (Blueprint $table) {
             $table->id();
             $table->dateTime('fecha');
-            $table->string('motivo');
-
-            //Clases Foráneas
+            $table->string('motivo', 255);
             $table->foreignId('paciente_id')->constrained('pacientes')->onDelete('cascade');
             $table->foreignId('medico_id')->constrained('medicos')->onDelete('cascade');
-
-            $table->string('estado')->default('Programada'); //Programada, completada, cancelada
+            $table->string('estado', 50)->default('Programada'); // Programada, Completada, Cancelada
             $table->text('observaciones')->nullable();
-            $table->string('sala');
+            $table->string('sala', 100)->nullable();
             $table->timestamps();
         });
     }
-
 
     public function down(): void
     {

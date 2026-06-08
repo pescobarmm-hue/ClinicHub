@@ -18,12 +18,11 @@ class Medicamento extends Model
         'duracion',
         'tratamiento_id',
         'proveedor',
-        'efectos_secundarios'
+        'efectos_secundarios',
     ];
 
-    // Relaciones
     public function tratamiento()
     {
-        return $this->belongsTo(Tratamiento::class, 'tratamiendo_id');
+        return $this->belongsTo(Tratamiento::class, 'tratamiento_id');
     }
 }

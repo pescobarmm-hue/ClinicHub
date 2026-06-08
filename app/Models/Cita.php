@@ -18,10 +18,13 @@ class Cita extends Model
         'medico_id',
         'estado',
         'observaciones',
-        'sala'
+        'sala',
     ];
 
-    // Relaciones
+    protected $casts = [
+        'fecha' => 'datetime',
+    ];
+
     public function paciente()
     {
         return $this->belongsTo(Paciente::class);

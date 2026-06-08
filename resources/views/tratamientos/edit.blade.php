@@ -1,14 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Nuevo Tratamiento')
-@section('page-title', 'Nuevo Tratamiento')
-@section('page-sub', 'Registrar plan de tratamiento')
+@section('title', 'Editar Tratamiento')
+@section('page-title', 'Editar Tratamiento')
+@section('page-sub', 'Modificar datos del tratamiento')
 
 @section('content')
 <div class="form-card">
     <div class="form-header">
-        <h3>Registrar tratamiento</h3>
-        <p>Complete los datos del tratamiento.</p>
+        <h3>Editar tratamiento: <strong>{{ $tratamiento->nombre }}</strong></h3>
     </div>
 
     {{-- ERRORES DE VALIDACIÓN --}}
@@ -23,19 +22,20 @@
     </div>
     @endif
 
-    <form action="{{ route('tratamientos.store') }}" method="POST">
+    <form action="{{ route('tratamientos.update', $tratamiento) }}" method="POST">
         @csrf
+        @method('PUT')
         <div class="form-body">
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">Nombre del tratamiento <span class="req">*</span></label>
+                    <label class="form-label">Nombre <span class="req">*</span></label>
                     <input type="text" name="nombre" class="form-input {{ $errors->has('nombre') ? 'is-invalid' : '' }}"
-                           value="{{ old('nombre') }}" required>
+                           value="{{ old('nombre', $tratamiento->nombre) }}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Duración <span class="req">*</span></label>
                     <input type="text" name="duracion" class="form-input {{ $errors->has('duracion') ? 'is-invalid' : '' }}"
-                           value="{{ old('duracion') }}" placeholder="Ej: 30 días, 6 semanas" required>
+                           value="{{ old('duracion', $tratamiento->duracion) }}" required>
                 </div>
             </div>
 
@@ -45,7 +45,8 @@
                     <select name="diagnostico_id" class="form-select {{ $errors->has('diagnostico_id') ? 'is-invalid' : '' }}" required>
                         <option value="">-- Seleccionar diagnóstico --</option>
                         @foreach($diagnosticos as $d)
-                            <option value="{{ $d->id }}" {{ old('diagnostico_id') == $d->id ? 'selected' : '' }}>
+                            <option value="{{ $d->id }}"
+                                {{ old('diagnostico_id', $tratamiento->diagnostico_id) == $d->id ? 'selected' : '' }}>
                                 {{ $d->descripcion }} — {{ $d->paciente->nombre ?? '' }} {{ $d->paciente->apellido ?? '' }}
                             </option>
                         @endforeach
@@ -56,7 +57,8 @@
                     <select name="medico_id" class="form-select {{ $errors->has('medico_id') ? 'is-invalid' : '' }}" required>
                         <option value="">-- Seleccionar médico --</option>
                         @foreach($medicos as $m)
-                            <option value="{{ $m->id }}" {{ old('medico_id') == $m->id ? 'selected' : '' }}>
+                            <option value="{{ $m->id }}"
+                                {{ old('medico_id', $tratamiento->medico_id) == $m->id ? 'selected' : '' }}>
                                 {{ $m->nombre }} {{ $m->apellido }}
                             </option>
                         @endforeach
@@ -67,22 +69,23 @@
             <div class="form-group">
                 <label class="form-label">Descripción <span class="req">*</span></label>
                 <textarea name="descripcion" class="form-textarea {{ $errors->has('descripcion') ? 'is-invalid' : '' }}"
-                          rows="3" required>{{ old('descripcion') }}</textarea>
+                          rows="3" required>{{ old('descripcion', $tratamiento->descripcion) }}</textarea>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">Estado</label>
                     <select name="estado" class="form-select">
-                        <option value="Activo"      {{ old('estado', 'Activo') == 'Activo'      ? 'selected' : '' }}>Activo</option>
-                        <option value="Finalizado"  {{ old('estado') == 'Finalizado'  ? 'selected' : '' }}>Finalizado</option>
-                        <option value="Suspendido"  {{ old('estado') == 'Suspendido'  ? 'selected' : '' }}>Suspendido</option>
+                        <option value="Activo"     {{ old('estado', $tratamiento->estado) == 'Activo'     ? 'selected' : '' }}>Activo</option>
+                        <option value="Finalizado" {{ old('estado', $tratamiento->estado) == 'Finalizado' ? 'selected' : '' }}>Finalizado</option>
+                        <option value="Suspendido" {{ old('estado', $tratamiento->estado) == 'Suspendido' ? 'selected' : '' }}>Suspendido</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Frecuencia de administración</label>
                     <input type="text" name="frecuencia_administracion" class="form-input"
-                           value="{{ old('frecuencia_administracion') }}" placeholder="Ej: Cada 8 horas">
+                           value="{{ old('frecuencia_administracion', $tratamiento->frecuencia_administracion) }}"
+                           placeholder="Ej: Cada 8 horas">
                 </div>
             </div>
         </div>
@@ -92,7 +95,7 @@
                 <i class="fas fa-times"></i> Cancelar
             </a>
             <button type="submit" class="btn-primary">
-                <i class="fas fa-save"></i> Guardar tratamiento
+                <i class="fas fa-save"></i> Actualizar tratamiento
             </button>
         </div>
     </form>

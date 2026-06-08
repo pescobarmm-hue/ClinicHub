@@ -21,7 +21,11 @@ class Paciente extends Model
         'tipo_sangre',
     ];
 
-    //Relaciones
+    protected $casts = [
+        'fecha_nacimiento' => 'date',
+    ];
+
+    // Relaciones
     public function citas()
     {
         return $this->hasMany(Cita::class);
@@ -32,4 +36,8 @@ class Paciente extends Model
         return $this->hasMany(Diagnostico::class);
     }
 
+    public function tratamientos()
+    {
+        return $this->hasMany(Tratamiento::class);
+    }
 }

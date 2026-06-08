@@ -1,14 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Nuevo Medicamento')
-@section('page-title', 'Nuevo Medicamento')
-@section('page-sub', 'Registrar un fármaco')
+@section('title', 'Editar Medicamento')
+@section('page-title', 'Editar Medicamento')
+@section('page-sub', 'Modificar datos del fármaco')
 
 @section('content')
 <div class="form-card">
     <div class="form-header">
-        <h3>Registrar medicamento</h3>
-        <p>Complete la información del medicamento.</p>
+        <h3>Editar medicamento: <strong>{{ $medicamento->nombre }}</strong></h3>
     </div>
 
     {{-- ERRORES DE VALIDACIÓN --}}
@@ -23,19 +22,20 @@
     </div>
     @endif
 
-    <form action="{{ route('medicamentos.store') }}" method="POST">
+    <form action="{{ route('medicamentos.update', $medicamento) }}" method="POST">
         @csrf
+        @method('PUT')
         <div class="form-body">
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">Nombre <span class="req">*</span></label>
                     <input type="text" name="nombre" class="form-input {{ $errors->has('nombre') ? 'is-invalid' : '' }}"
-                           value="{{ old('nombre') }}" required>
+                           value="{{ old('nombre', $medicamento->nombre) }}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Dosis <span class="req">*</span></label>
                     <input type="text" name="dosis" class="form-input {{ $errors->has('dosis') ? 'is-invalid' : '' }}"
-                           value="{{ old('dosis') }}" placeholder="Ej: 500mg" required>
+                           value="{{ old('dosis', $medicamento->dosis) }}" required>
                 </div>
             </div>
 
@@ -43,12 +43,12 @@
                 <div class="form-group">
                     <label class="form-label">Frecuencia <span class="req">*</span></label>
                     <input type="text" name="frecuencia" class="form-input {{ $errors->has('frecuencia') ? 'is-invalid' : '' }}"
-                           value="{{ old('frecuencia') }}" placeholder="Ej: Cada 8 horas" required>
+                           value="{{ old('frecuencia', $medicamento->frecuencia) }}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Duración <span class="req">*</span></label>
                     <input type="text" name="duracion" class="form-input {{ $errors->has('duracion') ? 'is-invalid' : '' }}"
-                           value="{{ old('duracion') }}" placeholder="Ej: 7 días" required>
+                           value="{{ old('duracion', $medicamento->duracion) }}" required>
                 </div>
             </div>
 
@@ -57,7 +57,8 @@
                 <select name="tratamiento_id" class="form-select {{ $errors->has('tratamiento_id') ? 'is-invalid' : '' }}" required>
                     <option value="">-- Seleccionar tratamiento --</option>
                     @foreach($tratamientos as $t)
-                        <option value="{{ $t->id }}" {{ old('tratamiento_id') == $t->id ? 'selected' : '' }}>
+                        <option value="{{ $t->id }}"
+                            {{ old('tratamiento_id', $medicamento->tratamiento_id) == $t->id ? 'selected' : '' }}>
                             {{ $t->nombre }}
                             @if($t->diagnostico?->paciente)
                                 — {{ $t->diagnostico->paciente->nombre }} {{ $t->diagnostico->paciente->apellido }}
@@ -70,13 +71,13 @@
             <div class="form-group">
                 <label class="form-label">Proveedor</label>
                 <input type="text" name="proveedor" class="form-input"
-                       value="{{ old('proveedor') }}" placeholder="Nombre del proveedor (opcional)">
+                       value="{{ old('proveedor', $medicamento->proveedor) }}"
+                       placeholder="Nombre del proveedor (opcional)">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Efectos secundarios</label>
-                <textarea name="efectos_secundarios" class="form-textarea" rows="2"
-                          placeholder="Describa los posibles efectos secundarios (opcional)">{{ old('efectos_secundarios') }}</textarea>
+                <textarea name="efectos_secundarios" class="form-textarea" rows="2">{{ old('efectos_secundarios', $medicamento->efectos_secundarios) }}</textarea>
             </div>
         </div>
 
@@ -85,7 +86,7 @@
                 <i class="fas fa-times"></i> Cancelar
             </a>
             <button type="submit" class="btn-primary">
-                <i class="fas fa-save"></i> Guardar medicamento
+                <i class="fas fa-save"></i> Actualizar medicamento
             </button>
         </div>
     </form>
