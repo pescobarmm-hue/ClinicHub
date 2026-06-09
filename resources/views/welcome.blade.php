@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClinicHub | Gestión Médica Premium</title>
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -560,6 +560,57 @@
         .met-mini-num { display:block; font-size:1.1rem; font-weight:900; line-height:1; }
         .met-mini-label { display:block; font-size:0.65rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; margin-top:2px; }
         .met-mini-divider { width:1px; height:30px; background:#e2e8f0; }
+
+        /* ===== ESTILOS PARA RESPUESTAS MASTER ===== */
+        .chat-bubble-ai, .chat-bubble-user {
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+            font-family: 'Plus Jakarta Sans', monospace;
+        }
+
+        .chat-bubble-ai {
+            background: #1e293b;
+            border-left: 3px solid #3b82f6;
+            font-size: 0.8rem;
+        }
+
+        .chat-bubble-ai code, .chat-bubble-ai pre {
+            background: #0f172a;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            color: #fbbf24;
+        }
+
+        .chat-bubble-ai table {
+            font-size: 0.7rem;
+            border-collapse: collapse;
+            margin: 8px 0;
+            width: 100%;
+        }
+
+        .chat-bubble-ai th, .chat-bubble-ai td {
+            border: 1px solid #475569;
+            padding: 4px 6px;
+            text-align: left;
+        }
+
+        .chat-bubble-ai th {
+            background: #0f172a;
+            color: #60a5fa;
+        }
+
+        .chat-bubble-ai hr {
+            border-color: #334155;
+            margin: 8px 0;
+        }
+
+        .wrap-break-word {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
 
     </style>
 </head>
@@ -1404,7 +1455,7 @@
     =========================== -->
 <div x-show="showDemo"
      x-cloak
-     class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+     class="fixed inset-0 z-9999 flex items-center justify-center p-4"
      style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);"
      x-transition.opacity.duration.300
      @wheel.prevent
@@ -1417,9 +1468,9 @@
          x-transition.scale.300">
 
         <!-- Header fijo -->
-        <div class="flex justify-between items-center p-5 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 shrink-0">
+        <div class="flex justify-between items-center p-5 border-b border-slate-200 bg-linear-to-r from-blue-50 to-indigo-50 shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-xl bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
                     <i class="fa-solid fa-display text-white text-lg"></i>
                 </div>
                 <div>
@@ -1481,7 +1532,7 @@
                                         <span class="text-xs text-slate-400" x-text="demo.desc.substring(0, 60) + '...'"></span>
                                     </div>
                                 </div>
-                                <a :href="demo.link" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-md flex items-center gap-2 shrink-0">
+                                <a :href="demo.link" class="bg-linear-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-md flex items-center gap-2 shrink-0">
                                     <i class="fa-solid fa-arrow-right"></i> Acceder
                                 </a>
                             </div>
@@ -1546,7 +1597,7 @@
 
                                     <div class="w-full h-full overflow-auto cursor-grab"
                                          :class="isDragging ? 'cursor-grabbing' : (zoomLevel > 100 ? 'cursor-grab' : 'cursor-default')">
-                                        <div class="flex items-center justify-center min-h-[400px] p-8">
+                                        <div class="flex items-center justify-center min-h-100 p-8">
                                             <img :src="demo.imageUrl"
                                                  :alt="demo.label"
                                                  class="zoom-img max-w-full rounded-xl shadow-lg pointer-events-none select-none"
@@ -1587,84 +1638,144 @@
 </div>
 
     <!-- ===========================
-         CHATBOT IA REAL
+     CHATBOT
     =========================== -->
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
-        <!-- Ventana de chat -->
-        <div x-show="chatOpen" x-cloak x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
-             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-             class="chat-window w-92.5 h-130 rounded-3xl flex flex-col overflow-hidden">
+<div class="fixed bottom-6 right-6 z-50" x-data="{ isOpen: false }">
 
-            <!-- Header chat -->
-            <div class="chat-header px-5 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="relative">
-                        <div class="h-10 w-10 rounded-xl bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-                            <i class="fa-solid fa-robot text-white"></i>
-                        </div>
-                        <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-slate-900"></span>
+    <!-- Botón flotante premium -->
+    <button @click="isOpen = !isOpen" class="relative group">
+        <div class="absolute -inset-1 bg-linear-to-r from-blue-600 to-indigo-600 rounded-full blur-lg opacity-75 group-hover:opacity-100 transition duration-300"></div>
+        <div class="relative bg-linear-to-r from-blue-600 to-indigo-600 rounded-full p-4 shadow-2xl hover:scale-110 transition-transform duration-300">
+            <i class="fa-solid fa-robot text-white text-2xl"></i>
+            <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
+        </div>
+    </button>
+
+    <!-- Ventana de chat premium -->
+    <div x-show="isOpen"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+         class="absolute bottom-20 right-0 w-112.5 h-162.5 bg-linear-to-b from-slate-900 to-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700"
+         style="display: none;"
+         x-show="isOpen">
+
+        <!-- Header premium -->
+        <div class="bg-linear-to-r from-blue-600 to-indigo-600 px-5 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                        <i class="fa-solid fa-heart-pulse text-white text-lg"></i>
                     </div>
-                    <div>
-                        <p class="text-white font-bold text-sm leading-tight">ClinicHub AI</p>
-                        <p class="text-slate-400 text-xs">Asistente médico inteligente</p>
-                    </div>
-                    <span class="ai-badge text-[10px] font-bold text-blue-300 px-2 py-0.5 rounded-full ml-1">Claude AI</span>
+                    <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
                 </div>
-                <button @click="chatOpen = false" class="h-8 w-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition">
-                    <i class="fa-solid fa-minus"></i>
+                <div>
+                    <h3 class="text-white font-bold text-sm">ClinicHub AI</h3>
+                    <p class="text-blue-200 text-[10px] font-medium">Asistente Clínico Premium • Online</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+                    <i class="fa-regular fa-circle-question text-sm"></i>
+                </button>
+                <button @click="isOpen = false" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
+        </div>
 
-            <!-- Messages -->
-            <div class="chat-messages flex-1 overflow-y-auto p-4 space-y-3 text-sm" x-ref="chatMessages">
-                <template x-for="(msg, idx) in chatMessages" :key="idx">
-                    <div :class="msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
-                        <div :class="msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'" class="max-w-[80%] px-4 py-3 text-sm leading-relaxed">
-                            <template x-if="msg.role === 'assistant'">
-                                <span><i class="fa-solid fa-robot text-blue-400 text-xs mr-1.5"></i></span>
-                            </template>
-                            <span x-text="msg.content"></span>
-                        </div>
-                    </div>
-                </template>
+        <!-- Status bar -->
+        <div class="bg-slate-800/50 px-5 py-2 flex items-center justify-between border-b border-slate-700">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span class="text-[10px] text-slate-400 font-medium">Sistema operativo</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <i class="fa-regular fa-clock text-slate-500 text-[10px]"></i>
+                <span class="text-[10px] text-slate-500" x-text="new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })"></span>
+                <i class="fa-solid fa-wifi text-slate-500 text-[10px]"></i>
+            </div>
+        </div>
 
-                <!-- Typing indicator -->
-                <div x-show="isTyping" class="flex justify-start">
-                    <div class="chat-bubble-ai px-4 py-3 flex items-center gap-1.5">
-                        <span class="text-slate-400 text-xs mr-1">Escribiendo</span>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
+        <!-- Mensajes -->
+        <div class="flex-1 h-100 overflow-y-auto p-4 space-y-3 bg-slate-900" x-ref="chatMessages">
+            <template x-for="(msg, idx) in chatMessages" :key="idx">
+                <div :class="msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                    <div :class="msg.role === 'user' ? 'bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-2xl rounded-br-md' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-2xl rounded-bl-md'"
+                         class="max-w-[85%] px-4 py-3 text-sm leading-relaxed shadow-lg"
+                         x-html="formatMessage(msg.content)">
                     </div>
                 </div>
-            </div>
+            </template>
 
-            <!-- Input -->
-            <div class="chat-input-area p-4">
-                <div class="flex items-center gap-2">
-                    <input type="text"
-                           x-model="chatInput"
-                           @keydown.enter.prevent="sendMessage()"
-                           :disabled="isTyping"
-                           placeholder="Pregunta sobre el sistema..."
-                           class="chat-input flex-1 px-4 py-3 rounded-xl text-sm">
-                    <button @click="sendMessage()"
-                            :disabled="isTyping || !chatInput.trim()"
-                            class="chat-send-btn h-11 w-11 rounded-xl flex items-center justify-center text-white cursor-pointer">
-                        <i class="fa-solid fa-paper-plane text-sm" x-show="!isTyping"></i>
-                        <i class="fa-solid fa-spinner fa-spin text-sm" x-show="isTyping"></i>
-                    </button>
+            <!-- Typing indicator -->
+            <div x-show="isTyping" class="flex justify-start">
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-bl-md px-4 py-3">
+                    <div class="flex gap-1">
+                        <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                        <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- FAB -->
-        <button @click="chatOpen = !chatOpen" class="chat-fab h-14 w-14 rounded-full flex items-center justify-center text-white cursor-pointer">
-            <i class="fa-solid fa-robot text-2xl" x-show="!chatOpen"></i>
-            <i class="fa-solid fa-xmark text-2xl" x-show="chatOpen"></i>
-        </button>
+        <!-- Input area -->
+        <div class="bg-slate-800 border-t border-slate-700 p-4">
+
+            <!-- Quick actions -->
+            <div class="flex flex-wrap gap-2 mb-3">
+                <button @click="quickQuestion('¿Cómo registro una cita?')"
+                        class="text-[10px] px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 hover:bg-blue-600 hover:text-white transition">
+                    📅 Registrar cita
+                </button>
+                <button @click="quickQuestion('¿Qué información contiene el expediente de un paciente?')"
+                        class="text-[10px] px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 hover:bg-blue-600 hover:text-white transition">
+                    📋 Expediente
+                </button>
+                <button @click="quickQuestion('¿Cómo se asignan los médicos a las especialidades?')"
+                        class="text-[10px] px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 hover:bg-blue-600 hover:text-white transition">
+                    👨‍⚕️ Médicos
+                </button>
+                <button @click="quickQuestion('¿Qué KPIs muestra el dashboard?')"
+                        class="text-[10px] px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 hover:bg-blue-600 hover:text-white transition">
+                    📊 Dashboard
+                </button>
+                <button @click="quickQuestion('¿Cuáles son los estados de las citas?')"
+                        class="text-[10px] px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 hover:bg-blue-600 hover:text-white transition">
+                    📌 Estados
+                </button>
+            </div>
+
+            <!-- Input field -->
+            <div class="flex gap-2">
+                <div class="flex-1 relative">
+                    <i class="fa-regular fa-message absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input type="text"
+                           x-model="chatInput"
+                           @keydown.enter.prevent="sendMessage()"
+                           :disabled="isTyping"
+                           placeholder="Escriba su consulta médica..."
+                           class="w-full pl-9 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+                </div>
+                <button @click="sendMessage()" :disabled="isTyping || !chatInput.trim()" class="w-10 h-10 bg-linear-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-paper-plane text-sm" x-show="!isTyping"></i>
+                    <i class="fa-solid fa-spinner fa-spin text-sm" x-show="isTyping"></i>
+                </button>
+            </div>
+
+            <!-- Footer info -->
+            <div class="flex justify-between items-center mt-3">
+                <div class="flex items-center gap-2"><i class="fa-solid fa-lock text-slate-600 text-[9px]"></i><span class="text-[9px] text-slate-500">Cifrado end-to-end</span></div>
+                <div class="flex items-center gap-2"><i class="fa-solid fa-bolt text-slate-600 text-[9px]"></i><span class="text-[9px] text-slate-500">Respuesta <span class="text-emerald-500">&lt; 500ms</span></span></div>
+                <div class="flex items-center gap-2"><i class="fa-regular fa-circle-check text-slate-600 text-[9px]"></i><span class="text-[9px] text-slate-500">SLA 99.98%</span></div>
+            </div>
+        </div>
     </div>
+</div>
 
     <!-- ===========================
          JAVASCRIPT PRINCIPAL
@@ -1676,13 +1787,13 @@
             showDemo: false,
             demoActive: 0,
             isZoomed: false,
-            chatOpen: false,
+            isOpen: false,
             chatInput: '',
             isTyping: false,
             chatMessages: [
                 {
                     role: 'assistant',
-                    content: '¡Hola! Soy el asistente de ClinicHub. Puedo ayudarte con información sobre los módulos, funcionalidades o cómo usar el sistema. ¿En qué te ayudo?'
+                    content: '**🏥 CLINICHUB PREMIUM**\n\n**Estimado profesional,**\n\nSoy el Asistente Virtual de ClinicHub. Puedo ayudarle con información sobre los siguientes módulos:\n\n• **Pacientes** - Gestión de expedientes electrónicos\n• **Citas** - Programación y seguimiento\n• **Médicos** - Administración del equipo médico\n• **Diagnósticos** - Registro con CIE-10\n• **Tratamientos** - Planes terapéuticos\n• **Medicamentos** - Control farmacéutico\n• **Dashboard** - KPIs en tiempo real\n\n---\n*¿Sobre qué módulo desea información?*'
                 }
             ],
             navItems: [
@@ -1780,12 +1891,25 @@
                 }
             },
 
-            // ===== CHATBOT IA REAL =====
+            // ========== FUNCIONES DEL CHATBOT ==========
+
+            formatMessage(content) {
+                if (!content) return '';
+                // Reemplazar **texto** por <strong>texto</strong>
+                let formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-blue-400">$1</strong>');
+                // Reemplazar saltos de línea por <br>
+                formatted = formatted.replace(/\n/g, '<br>');
+                // Reemplazar viñetas
+                formatted = formatted.replace(/•/g, '<span class="text-blue-400 mr-2">•</span>');
+                return formatted;
+            },
+
             async sendMessage() {
                 const text = this.chatInput.trim();
                 if (!text || this.isTyping) return;
 
                 this.chatMessages.push({ role: 'user', content: text });
+                const userQuestion = text;
                 this.chatInput = '';
                 this.isTyping = true;
 
@@ -1793,25 +1917,28 @@
                 this.scrollChat();
 
                 try {
-                    const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    const response = await fetch('/chatbot/send', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: 'claude-sonnet-4-20250514',
-                            max_tokens: 400,
-                            system: `Eres el asistente de IA de ClinicHub, un sistema premium de gestión médica en español.
-                            Ayudas a usuarios con información sobre los módulos del sistema: Gestión de Pacientes, Citas Inteligentes, Diagnósticos, Tratamientos, Medicamentos y Médicos.
-                            Responde siempre en español, de forma concisa (máximo 3 oraciones), profesional y amigable.
-                            Si preguntan sobre funcionalidades, explica cómo el módulo correspondiente ayuda al trabajo médico.`,
-                            messages: this.chatMessages.map(m => ({ role: m.role, content: m.content }))
-                        })
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ message: userQuestion })
                     });
 
                     const data = await response.json();
-                    const reply = data?.content?.[0]?.text || 'Lo siento, hubo un error. ¿Puedo ayudarte con algo más?';
-                    this.chatMessages.push({ role: 'assistant', content: reply });
+
+                    if (data.success) {
+                        this.chatMessages.push({ role: 'assistant', content: data.reply });
+                    } else {
+                        this.chatMessages.push({ role: 'assistant', content: data.reply });
+                    }
                 } catch (err) {
-                    this.chatMessages.push({ role: 'assistant', content: 'Lo siento, hubo un problema de conexión. Por favor intenta de nuevo.' });
+                    console.error('Chat error:', err);
+                    this.chatMessages.push({
+                        role: 'assistant',
+                        content: '⚠️ Error de conexión. Por favor, verifique su conexión a internet e intente nuevamente.\n\n*Si el problema persiste, contacte a soporte@clinichub.com*'
+                    });
                 }
 
                 this.isTyping = false;
@@ -1819,10 +1946,17 @@
                 this.scrollChat();
             },
 
+            quickQuestion(question) {
+                this.chatInput = question;
+                this.sendMessage();
+            },
+
             scrollChat() {
                 const el = this.$refs.chatMessages;
                 if (el) el.scrollTop = el.scrollHeight;
             },
+
+            // ========== FIN FUNCIONES CHATBOT ==========
 
             // ===== HEX PARTICLES =====
             initHexParticles() {
@@ -1918,12 +2052,11 @@
         }
     }
 
-        window.resetZoomGlobal = function() {
-        // Función global para resetear zoom desde cualquier lugar
+    window.resetZoomGlobal = function() {
         const event = new CustomEvent('resetZoom');
         window.dispatchEvent(event);
     };
-    </script>
+</script>
 
     <style>
         @keyframes progressLoad {
@@ -1933,6 +2066,72 @@
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.15); }
+        }
+
+        /* Eliminar scroll horizontal en el contenedor de mensajes */
+        .chat-messages, .flex-1.overflow-y-auto {
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+        }
+
+        /* Mejorar el espaciado de los mensajes */
+        .bg-slate-800, .bg-gradient-to-r {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        /* Ajustar el tamaño de la ventana del chat */
+        .absolute.bottom-20.right-0 {
+            width: 420px;
+            max-width: calc(100vw - 32px);
+        }
+
+        /* Mejorar los botones de acción rápida */
+        .flex.flex-wrap.gap-2.mb-3 button {
+            font-size: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .flex.flex-wrap.gap-2.mb-3 button:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Mejorar el header del chat */
+        .bg-gradient-to-r.from-blue-600.to-indigo-600 {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+        }
+
+        /* Mejorar el área de input */
+        .bg-slate-900 {
+            background-color: #0f172a;
+        }
+
+        /* Mejorar las burbujas de chat */
+        .rounded-2xl {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Scrollbar personalizado más elegante */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
         }
     </style>
 

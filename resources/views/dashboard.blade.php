@@ -795,6 +795,60 @@ body {
 
 /* Animación de entrada para cada vista dentro del área de contenido */
 #contentArea > * { animation: fadeUp 0.35s var(--transition) both; }
+
+/* ══════════════════════════════════════════════════════════════
+   MEJORAS UX MODAL PACIENTES
+   ══════════════════════════════════════════════════════════════ */
+/* Selector visual de género */
+.gender-selector { display: flex; gap: 0.5rem; }
+.gender-option {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 0.35rem; padding: 0.65rem 0.5rem;
+  border: 1.5px solid var(--pearl-200); border-radius: var(--radius-md);
+  cursor: pointer; background: var(--pearl-50);
+  transition: all 0.18s; font-size: 0.78rem;
+  color: var(--pearl-500); font-family: var(--font-body);
+}
+.gender-option i { font-size: 1.1rem; }
+.gender-option:hover { border-color: var(--pearl-400); background: #fff; color: var(--pearl-700); }
+.gender-option.selected {
+  border-color: var(--pearl-700); background: var(--pearl-800);
+  color: #fff; box-shadow: 0 2px 8px rgba(42,53,71,0.18);
+}
+/* Chips de tipo de sangre */
+.blood-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.4rem; }
+.blood-chip {
+  text-align: center; padding: 0.45rem 0.3rem;
+  border: 1.5px solid var(--pearl-200); border-radius: 8px;
+  cursor: pointer; font-size: 0.82rem; font-weight: 600;
+  color: var(--pearl-500); background: var(--pearl-50);
+  font-family: var(--font-mono); transition: all 0.15s;
+}
+.blood-chip:hover { border-color: var(--pearl-400); color: var(--pearl-700); background: #fff; }
+.blood-chip.selected {
+  border-color: #dc2626; background: #fef2f2; color: #dc2626;
+}
+/* Indicador de edad calculada */
+.age-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: var(--pearl-100); border: 1px solid var(--pearl-200);
+  border-radius: 50px; padding: 0.2rem 0.65rem;
+  font-size: 0.75rem; color: var(--pearl-600); margin-top: 0.35rem;
+  font-family: var(--font-mono); transition: all 0.2s;
+}
+.age-badge.visible { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+/* Input con ícono de teléfono */
+.phone-wrap { position: relative; }
+.phone-wrap .phone-prefix {
+  position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
+  font-size: 0.78rem; color: var(--pearl-400); font-family: var(--font-mono);
+  pointer-events: none; user-select: none;
+}
+.phone-wrap input { padding-left: 2.4rem !important; }
+/* Divider en modal */
+.modal-divider {
+  height: 1px; background: var(--pearl-100); margin: 0.5rem 0 1rem;
+}
 @keyframes fadeUp {
   from { opacity:0; transform:translateY(10px); }
   to { opacity:1; transform:translateY(0); }
@@ -870,6 +924,428 @@ body {
   color: #fff;
 }
 .banner-stat .l { font-size: 0.72rem; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; }
+
+/* ══════ SEARCH DROPDOWN MASTER ══════ */
+#searchDropdown {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+  background: #fff; border: 1px solid var(--pearl-200);
+  border-radius: 16px; box-shadow: 0 20px 60px rgba(60,85,115,0.16), 0 4px 16px rgba(60,85,115,0.08);
+  z-index: 9999; overflow: hidden;
+  max-height: 440px; overflow-y: auto;
+  display: none; /* oculto por defecto */
+  animation: dropReveal .18s cubic-bezier(.4,0,.2,1);
+  min-width: 380px;
+}
+@keyframes dropReveal {
+  from { opacity:0; transform:translateY(-8px) scale(.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.search-section-label {
+  padding: .45rem 1rem .25rem;
+  font-size: .6rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--pearl-400); font-weight: 600;
+  border-top: 1px solid var(--pearl-100);
+}
+.search-section-label:first-child { border-top: none; }
+.search-result-item {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .6rem 1rem; cursor: pointer;
+  transition: background .12s;
+}
+.search-result-item:hover, .search-result-item.kbd-focus {
+  background: var(--pearl-50);
+}
+.search-result-icon {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+}
+.search-result-icon.mod  { background: var(--pearl-100); color: var(--pearl-600); }
+.search-result-icon.pac  { background: #eff6ff; color: #2563eb; }
+.search-result-icon.med  { background: #f0fdf8; color: #0d9488; }
+.search-result-icon.cit  { background: #f5f3ff; color: #7c3aed; }
+.search-result-icon.diag { background: #fff7ed; color: #ea580c; }
+.search-result-icon.trat { background: #fdf4ff; color: #9333ea; }
+.search-result-icon.medi { background: #fffbeb; color: #d97706; }
+.search-result-text { flex: 1; min-width: 0; }
+.search-result-text strong {
+  font-size: .84rem; color: var(--pearl-800); display: block;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.search-result-text span {
+  font-size: .72rem; color: var(--pearl-400);
+}
+.search-result-tag {
+  font-size: .65rem; padding: 2px 8px; border-radius: 20px;
+  background: var(--pearl-100); color: var(--pearl-500);
+  white-space: nowrap;
+}
+.search-result-arrow { color: var(--pearl-300); font-size: .75rem; }
+.search-empty {
+  padding: 2rem 1rem; text-align: center;
+  color: var(--pearl-400); font-size: .85rem;
+}
+.search-empty i { font-size: 1.4rem; display: block; margin-bottom: .5rem; color: var(--pearl-300); }
+.search-footer {
+  padding: .5rem 1rem;
+  border-top: 1px solid var(--pearl-100);
+  display: flex; gap: 1rem;
+  background: var(--pearl-50);
+}
+.search-footer-hint {
+  font-size: .65rem; color: var(--pearl-400);
+  display: flex; align-items: center; gap: .3rem;
+}
+.search-footer-hint kbd {
+  background: #fff; border: 1px solid var(--pearl-200);
+  border-radius: 4px; padding: 1px 5px;
+  font-size: .62rem; color: var(--pearl-600);
+  font-family: var(--font-mono);
+}
+
+/* ========== ESTILOS PARA FORMULARIOS MEJORADOS ========== */
+
+/* Selector de género y radios */
+.gender-selector, .radio-group, .severity-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+.radio-label{
+    cursor: pointer;
+    user-select: none;
+}
+.radio-label input{
+    display: none;
+}
+.gender-option, .radio-label, .severity-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 40px;
+    border: 1.5px solid var(--pearl-200);
+    background: var(--pearl-50);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: var(--pearl-700);
+}
+
+.gender-option i {
+    font-size: 0.9rem;
+}
+
+.gender-option:hover, .radio-label:hover, .severity-chip:hover {
+    border-color: var(--pearl-400);
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+.gender-option.selected, .radio-label.selected, .severity-chip.selected {
+    border-color: var(--pearl-700);
+    background: var(--pearl-800);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Selector de experiencia médica */
+.exp-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.exp-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 40px;
+    border: 1.5px solid var(--pearl-200);
+    background: var(--pearl-50);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: var(--pearl-700);
+}
+
+.exp-btn:hover {
+    border-color: var(--pearl-400);
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+.exp-btn.selected {
+    border-color: var(--pearl-700);
+    background: var(--pearl-800);
+    color: #fff;
+}
+
+/* Grid de tipos de sangre */
+.blood-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.blood-chip {
+    text-align: center;
+    padding: 0.5rem 0.3rem;
+    border: 1.5px solid var(--pearl-200);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--pearl-600);
+    background: var(--pearl-50);
+    transition: all 0.2s ease;
+    font-family: var(--font-mono);
+}
+
+.blood-chip:hover {
+    border-color: var(--pearl-400);
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+.blood-chip.selected {
+    border-color: #dc2626;
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* Teléfono con prefijo */
+.phone-wrap {
+    position: relative;
+}
+
+.phone-wrap .phone-prefix {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: var(--pearl-500);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    pointer-events: none;
+}
+
+.phone-wrap input {
+    padding-left: 2.5rem !important;
+}
+
+/* Badge de edad */
+.age-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--pearl-100);
+    border: 1px solid var(--pearl-200);
+    border-radius: 40px;
+    padding: 0.2rem 0.75rem;
+    font-size: 0.7rem;
+    color: var(--pearl-600);
+    margin-top: 0.4rem;
+}
+
+.age-badge.visible {
+    background: #d1fae5;
+    border-color: #6ee7b7;
+    color: #065f46;
+}
+
+/* Radio buttons ocultos pero funcionales */
+.radio-label input {
+    display: none;
+}
+
+/* Campo personalizado para experiencia */
+#expCustom {
+    margin-top: 0.6rem;
+}
+
+/* Ajustes de espaciado en formularios */
+.form-row {
+    margin-bottom: 0.2rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Toolbar de búsqueda en tablas */
+.table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--pearl-100);
+}
+
+.table-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--pearl-50);
+    border: 1px solid var(--pearl-200);
+    border-radius: 40px;
+    padding: 0.4rem 0.9rem;
+    flex: 1;
+    max-width: 300px;
+}
+
+.table-search input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.85rem;
+    width: 100%;
+}
+
+/* Botones de acción en tabla */
+.tbl-actions {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.act-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--pearl-200);
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--pearl-500);
+    transition: all 0.15s;
+    text-decoration: none;
+}
+
+.act-btn:hover {
+    background: var(--pearl-100);
+    color: var(--pearl-800);
+}
+
+.act-btn.del:hover {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+/* Paginación */
+.pagination {
+    display: flex;
+    gap: 0.3rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.pagination a, .pagination span {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--pearl-200);
+    color: var(--pearl-600);
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
+.pagination .active span {
+    background: var(--pearl-800);
+    color: #fff;
+    border-color: var(--pearl-800);
+}
+
+/* Mensajes de validación */
+.text-danger {
+    color: #dc2626;
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.is-invalid {
+    border-color: #dc2626 !important;
+    background: #fef2f2 !important;
+}
+
+/* Badges en tablas */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.6rem;
+    border-radius: 40px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.badge-active { background: #d1fae5; color: #065f46; }
+.badge-pending { background: #fed7aa; color: #9a3412; }
+.badge-done { background: #e0e7ff; color: #3730a3; }
+.badge-cancel { background: #fee2e2; color: #991b1b; }
+
+/* Mejoras adicionales para inputs y selects */
+.form-input, .form-select, .form-textarea {
+    background: #fff;
+    border: 1px solid var(--pearl-200);
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--pearl-500);
+    box-shadow: 0 0 0 3px rgba(90, 110, 130, 0.1);
+    outline: none;
+}
+
+/* Títulos de formularios en modal */
+.modal-header h3 {
+    font-size: 1.3rem;
+}
+
+/* Botones más elegantes */
+.btn-primary, .btn-secondary {
+    padding: 0.6rem 1.2rem;
+    border-radius: 40px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--pearl-800);
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--pearl-900);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--pearl-300);
+    color: var(--pearl-600);
+}
+
+.btn-secondary:hover {
+    background: var(--pearl-50);
+    border-color: var(--pearl-400);
+}
+
 </style>
 </head>
 <body>
@@ -964,16 +1440,20 @@ body {
     </div>
   </nav>
 
-  <!-- MAIN PANEL -->
+  <!-- MAIN PANEL Y BARRA DE BUSCADOR -->
   <div id="mainPanel">
     <header class="topbar">
       <div class="topbar-title">
         <h2 id="topbarTitle">Panel Principal</h2>
         <p id="topbarSub">Vista general del sistema</p>
       </div>
-      <div class="topbar-search">
-        <i class="fas fa-search"></i>
-        <input type="text" id="globalSearch" placeholder="Buscar en este módulo...">
+      <div class="topbar-search" id="searchWrapper" style="position:relative;">
+        <i class="fas fa-search" id="searchIcon"></i>
+        <input type="text" id="globalSearch" placeholder="Buscar módulos, pacientes, médicos..." autocomplete="off">
+        <div id="searchSpinner" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);">
+          <i class="fas fa-circle-notch fa-spin" style="color:var(--pearl-400);font-size:.8rem;"></i>
+        </div>
+        <div id="searchDropdown"></div>
       </div>
       <div class="topbar-actions">
         <div class="icon-btn notif-dot" title="Notificaciones"><i class="fas fa-bell"></i></div>
@@ -1008,7 +1488,7 @@ body {
 
 <script>
 // ════════════════════════════════════════════════════════════════
-// BASE DE DATOS (conectada al backend, sin datos estáticos)
+// BASE DE DATOS
 // ════════════════════════════════════════════════════════════════
 let db = {
   pacientes: [],
@@ -1018,17 +1498,16 @@ let db = {
   medicamentos: [],
   tratamientos: []
 };
-let nextIds = {}; // Se calculará al cargar los datos del servidor
+let nextIds = {};
 let currentModule = 'inicio';
 let currentSearch = '';
 let pendingModalSave = null;
 
 // ════════════════════════════════════════════════════════════════
-// CARGA DE DATOS DESDE EL SERVIDOR (reemplaza los endpoints)
+// CARGA DE DATOS
 // ════════════════════════════════════════════════════════════════
 async function loadDB() {
   try {
-    // Reemplaza estas URLs con las rutas reales de tu API
     const [pacientes, medicos, citas, diagnosticos, medicamentos, tratamientos] = await Promise.all([
       fetch('/api/pacientes').then(r => r.json()),
       fetch('/api/medicos').then(r => r.json()),
@@ -1037,39 +1516,33 @@ async function loadDB() {
       fetch('/api/medicamentos').then(r => r.json()),
       fetch('/api/tratamientos').then(r => r.json())
     ]);
-
     db = { pacientes, medicos, citas, diagnosticos, medicamentos, tratamientos };
   } catch (error) {
-    console.error('Error al cargar datos desde el servidor:', error);
+    console.error('Error al cargar datos:', error);
     toast('Error al conectar con la base de datos', 'error');
   }
-
-  // Calcula los próximos IDs (si tu backend usa autoincrement, puedes omitir esto)
   for (let k in db) {
     nextIds[k] = db[k].length ? Math.max(...db[k].map(i => i.id)) + 1 : 1;
   }
 }
 
 // ════════════════════════════════════════════════════════════════
-// GUARDADO EN EL SERVIDOR (ejemplo genérico – adáptalo a tu API)
+// GUARDADO EN SERVIDOR
 // ════════════════════════════════════════════════════════════════
 async function saveRecordToServer(entity, record, isNew) {
   const url = isNew ? `/api/${entity}` : `/api/${entity}/${record.id}`;
   const method = isNew ? 'POST' : 'PUT';
-
   try {
     const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Solo necesario si usas Laravel
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
       },
       body: JSON.stringify(record)
     });
-
     if (!response.ok) throw new Error('Error en la petición');
     const saved = await response.json();
-    // Si la API devuelve {ok:true, data:{...}}, extraer data
     return saved.data ? saved.data : saved;
   } catch (error) {
     console.error('Error al guardar:', error);
@@ -1082,9 +1555,7 @@ async function deleteRecordFromServer(entity, id) {
   try {
     const response = await fetch(`/api/${entity}/${id}`, {
       method: 'DELETE',
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      }
+      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
     });
     if (!response.ok) throw new Error('Error al eliminar');
     return true;
@@ -1113,13 +1584,13 @@ function toast(msg, type = 'success') {
 // NAVIGATION
 // ════════════════════════════════════════════════════════════════
 const MODULE_META = {
-  inicio:      { title: 'Panel Principal',   sub: 'Vista general del sistema',        icon: 'chart-pie' },
-  pacientes:   { title: 'Pacientes',         sub: 'Gestión de pacientes registrados',  icon: 'users' },
-  medicos:     { title: 'Médicos',           sub: 'Especialistas del sistema',         icon: 'user-md' },
-  citas:       { title: 'Citas',             sub: 'Calendario de atención médica',     icon: 'calendar-check' },
-  diagnosticos:{ title: 'Diagnósticos',      sub: 'Historial clínico de diagnósticos', icon: 'stethoscope' },
-  tratamientos:{ title: 'Tratamientos',      sub: 'Planes de tratamiento activos',     icon: 'notes-medical' },
-  medicamentos:{ title: 'Medicamentos',      sub: 'Inventario y stock farmacéutico',   icon: 'capsules' },
+  inicio:      { title: 'Panel Principal',   sub: 'Vista general del sistema' },
+  pacientes:   { title: 'Pacientes',         sub: 'Gestión de pacientes registrados' },
+  medicos:     { title: 'Médicos',           sub: 'Especialistas del sistema' },
+  citas:       { title: 'Citas',             sub: 'Calendario de atención médica' },
+  diagnosticos:{ title: 'Diagnósticos',      sub: 'Historial clínico de diagnósticos' },
+  tratamientos:{ title: 'Tratamientos',      sub: 'Planes de tratamiento activos' },
+  medicamentos:{ title: 'Medicamentos',      sub: 'Inventario y stock farmacéutico' },
 };
 
 function setActiveNav(mod) {
@@ -1142,7 +1613,7 @@ function navigate(mod) {
 }
 
 // ════════════════════════════════════════════════════════════════
-// RENDER DASHBOARD (se mantiene igual, ahora usa db cargada)
+// RENDER DASHBOARD
 // ════════════════════════════════════════════════════════════════
 const avColors = ['#dbeafe','#dcfce7','#fef9c3','#fce7f3','#ede9fe','#ffedd5'];
 const avText   = ['#1d4ed8','#15803d','#854d0e','#9d174d','#6d28d9','#c2410c'];
@@ -1195,82 +1666,24 @@ function renderDashboard() {
     </div>
 
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-          <span class="stat-trend up">↑ +12%</span>
-        </div>
-        <div class="stat-num" id="animPt">0</div>
-        <div class="stat-label">Pacientes Activos</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon teal"><i class="fas fa-calendar-check"></i></div>
-          <span class="stat-trend up">↑ +8%</span>
-        </div>
-        <div class="stat-num" id="animCt">0</div>
-        <div class="stat-label">Citas Totales</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon purple"><i class="fas fa-user-md"></i></div>
-          <span class="stat-trend neutral">Estable</span>
-        </div>
-        <div class="stat-num" id="animMd">0</div>
-        <div class="stat-label">Especialistas</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon amber"><i class="fas fa-capsules"></i></div>
-          <span class="stat-trend down">↓ −3%</span>
-        </div>
-        <div class="stat-num" id="animSt">0</div>
-        <div class="stat-label">Stock Total</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon rose"><i class="fas fa-calendar-day"></i></div>
-          <span class="stat-trend up">Hoy</span>
-        </div>
-        <div class="stat-num" id="animCh">0</div>
-        <div class="stat-label">Citas de Hoy</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon sky"><i class="fas fa-notes-medical"></i></div>
-          <span class="stat-trend up">↑ activo</span>
-        </div>
-        <div class="stat-num">${db.tratamientos.length}</div>
-        <div class="stat-label">Tratamientos</div>
-      </div>
+      <div class="stat-card"><div class="stat-card-header"><div class="stat-icon blue"><i class="fas fa-users"></i></div><span class="stat-trend up">↑ +12%</span></div><div class="stat-num" id="animPt">0</div><div class="stat-label">Pacientes Activos</div></div>
+      <div class="stat-card"><div class="stat-card-header"><div class="stat-icon teal"><i class="fas fa-calendar-check"></i></div><span class="stat-trend up">↑ +8%</span></div><div class="stat-num" id="animCt">0</div><div class="stat-label">Citas Totales</div></div>
+      <div class="stat-card"><div class="stat-card-header"><div class="stat-icon purple"><i class="fas fa-user-md"></i></div><span class="stat-trend neutral">Estable</span></div><div class="stat-num" id="animMd">0</div><div class="stat-label">Especialistas</div></div>
+      <div class="stat-card"><div class="stat-card-header"><div class="stat-icon amber"><i class="fas fa-capsules"></i></div><span class="stat-trend down">↓ −3%</span></div><div class="stat-num" id="animSt">0</div><div class="stat-label">Stock Total</div></div>
+      <div class="stat-card"><div class="stat-card-header"><div class="stat-icon rose"><i class="fas fa-calendar-day"></i></div><span class="stat-trend up">Hoy</span></div><div class="stat-num" id="animCh">0</div><div class="stat-label">Citas de Hoy</div></div>
+      <div class="stat-card"><div class="stat-card-header"><div class="stat-icon sky"><i class="fas fa-notes-medical"></i></div><span class="stat-trend up">↑ activo</span></div><div class="stat-num">${db.tratamientos.length}</div><div class="stat-label">Tratamientos</div></div>
     </div>
 
     <div class="grid-2">
-      <div class="card">
-        <div class="card-title"><i class="fas fa-chart-line"></i> Citas por Mes</div>
-        <div class="chart-wrap"><canvas id="chartCitas"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title"><i class="fas fa-chart-doughnut"></i> Distribución</div>
-        <div class="chart-wrap"><canvas id="chartDist"></canvas></div>
-      </div>
+      <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> Citas por Mes</div><div class="chart-wrap"><canvas id="chartCitas"></canvas></div></div>
+      <div class="card"><div class="card-title"><i class="fas fa-chart-doughnut"></i> Distribución</div><div class="chart-wrap"><canvas id="chartDist"></canvas></div></div>
     </div>
 
     <div class="grid-3">
-      <div class="card">
-        <div class="card-title"><i class="fas fa-clock"></i> Próximas Citas</div>
-        <div class="appt-list">${upcomingCitas || '<p style="color:var(--pearl-400);font-size:.85rem;text-align:center;padding:1rem">Sin citas registradas</p>'}</div>
-      </div>
-      <div class="card">
-        <div class="card-title"><i class="fas fa-info-circle"></i> Resumen Rápido</div>
-        <div class="quick-stat-row">
-          <div class="quick-stat"><div class="num">${db.diagnosticos.length}</div><div class="lbl">Diagnósticos</div></div>
-          <div class="quick-stat"><div class="num">${db.medicamentos.length}</div><div class="lbl">Medicamentos</div></div>
-        </div>
-        <div class="quick-stat-row">
-          <div class="quick-stat"><div class="num">${db.tratamientos.length}</div><div class="lbl">Tratamientos</div></div>
-          <div class="quick-stat"><div class="num">${db.citas.filter(c => c.estado === 'pendiente').length}</div><div class="lbl">Pendientes</div></div>
-        </div>
+      <div class="card"><div class="card-title"><i class="fas fa-clock"></i> Próximas Citas</div><div class="appt-list">${upcomingCitas || '<p style="color:var(--pearl-400);font-size:.85rem;text-align:center;padding:1rem">Sin citas registradas</p>'}</div></div>
+      <div class="card"><div class="card-title"><i class="fas fa-info-circle"></i> Resumen Rápido</div>
+        <div class="quick-stat-row"><div class="quick-stat"><div class="num">${db.diagnosticos.length}</div><div class="lbl">Diagnósticos</div></div><div class="quick-stat"><div class="num">${db.medicamentos.length}</div><div class="lbl">Medicamentos</div></div></div>
+        <div class="quick-stat-row"><div class="quick-stat"><div class="num">${db.tratamientos.length}</div><div class="lbl">Tratamientos</div></div><div class="quick-stat"><div class="num">${db.citas.filter(c => c.estado === 'pendiente').length}</div><div class="lbl">Pendientes</div></div></div>
         <div style="margin-top:1rem; padding:1rem; background:var(--pearl-50); border-radius:12px; border:1px solid var(--pearl-100);">
           <div style="font-size:.72rem;color:var(--pearl-400);letter-spacing:.06em;margin-bottom:.3rem;">INGRESOS ESTIMADOS</div>
           <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:600;color:var(--pearl-800);">${ingresos}</div>
@@ -1288,38 +1701,15 @@ function renderDashboard() {
   const ctx1 = document.getElementById('chartCitas')?.getContext('2d');
   if (ctx1) new Chart(ctx1, {
     type: 'line',
-    data: {
-      labels: ['Ene','Feb','Mar','Abr','May','Jun'],
-      datasets: [{
-        label: 'Citas', data: [8,14,11,18,22, db.citas.length],
-        borderColor: '#64748b', backgroundColor: 'rgba(100,116,139,0.06)',
-        tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#64748b',
-        borderWidth: 2
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11 } } },
-        y: { grid: { color: 'rgba(148,163,184,0.15)' }, ticks: { color: '#94a3b8', font: { size: 11 } } }
-      }
-    }
+    data: { labels: ['Ene','Feb','Mar','Abr','May','Jun'], datasets: [{ label: 'Citas', data: [8,14,11,18,22, db.citas.length], borderColor: '#64748b', backgroundColor: 'rgba(100,116,139,0.06)', tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#64748b', borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11 } } }, y: { grid: { color: 'rgba(148,163,184,0.15)' }, ticks: { color: '#94a3b8', font: { size: 11 } } } } }
   });
 
   const ctx2 = document.getElementById('chartDist')?.getContext('2d');
   if (ctx2) new Chart(ctx2, {
     type: 'doughnut',
-    data: {
-      labels: ['Pacientes','Médicos','Citas','Medicamentos'],
-      datasets: [{
-        data: [db.pacientes.length, db.medicos.length, db.citas.length, db.medicamentos.length],
-        backgroundColor: ['#bfdbfe','#bbf7d0','#ddd6fe','#fed7aa'],
-        borderColor: ['#93c5fd','#86efac','#c4b5fd','#fdba74'],
-        borderWidth: 1
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '68%',
-      plugins: { legend: { position: 'bottom', labels: { color: '#64748b', font: { size: 11 }, padding: 12 } } }
-    }
+    data: { labels: ['Pacientes','Médicos','Citas','Medicamentos'], datasets: [{ data: [db.pacientes.length, db.medicos.length, db.citas.length, db.medicamentos.length], backgroundColor: ['#bfdbfe','#bbf7d0','#ddd6fe','#fed7aa'], borderColor: ['#93c5fd','#86efac','#c4b5fd','#fdba74'], borderWidth: 1 }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom', labels: { color: '#64748b', font: { size: 11 }, padding: 12 } } } }
   });
 }
 
@@ -1341,109 +1731,73 @@ function animCount(id, target, duration) {
 // ════════════════════════════════════════════════════════════════
 const FIELDS = {
   pacientes: [
-    { k: 'nombre',           l: 'Nombre' },
-    { k: 'apellido',         l: 'Apellido' },
-    { k: 'fecha_nacimiento', l: 'Fecha Nac.' },
-    { k: 'genero',           l: 'Género' },
-    { k: 'telefono',         l: 'Teléfono' },
-    { k: 'tipo_sangre',      l: 'Tipo Sangre' },
-    ],
+    { k: 'nombre', l: 'Nombre' }, { k: 'apellido', l: 'Apellido' },
+    { k: 'fecha_nacimiento', l: 'Fecha Nac.' }, { k: 'genero', l: 'Género' },
+    { k: 'telefono', l: 'Teléfono' }, { k: 'tipo_sangre', l: 'Tipo Sangre' }
+  ],
   medicos: [
-    { k: 'nombre',           l: 'Nombre' },
-    { k: 'apellido',         l: 'Apellido' },
-    { k: 'especialidad',     l: 'Especialidad' },
-    { k: 'telefono',         l: 'Teléfono' },
-    { k: 'email',            l: 'Email' },
-    { k: 'licencia',         l: 'Licencia' },
-    { k: 'años_experiencia', l: 'Años de Exp.' },
-    ],
+    { k: 'nombre', l: 'Nombre' }, { k: 'apellido', l: 'Apellido' },
+    { k: 'especialidad', l: 'Especialidad' }, { k: 'telefono', l: 'Teléfono' },
+    { k: 'email', l: 'Email' }, { k: 'licencia', l: 'Licencia' },
+    { k: 'años_experiencia', l: 'Años de Exp.' }
+  ],
   citas: [
-    { k: 'paciente',  l: 'Paciente' },
-    { k: 'medico',    l: 'Médico' },
-    { k: 'fecha',     l: 'Fecha' },
-    { k: 'hora',      l: 'Hora' },
-    { k: 'motivo',    l: 'Motivo' },
-    { k: 'sala',      l: 'Sala' },
-    { k: 'estado',    l: 'Estado' },
-],
-
+    { k: 'pacienteId', l: 'Paciente' }, { k: 'medicoId', l: 'Médico' },
+    { k: 'fecha', l: 'Fecha' }, { k: 'hora', l: 'Hora' },
+    { k: 'motivo', l: 'Motivo' }, { k: 'sala', l: 'Sala' },
+    { k: 'estado', l: 'Estado' }
+  ],
   diagnosticos: [
-      { k: 'paciente',    l: 'Paciente' },
-      { k: 'medico',      l: 'Médico' },
-      { k: 'diagnostico', l: 'Diagnóstico' },
-      { k: 'gravedad',    l: 'Gravedad' },
-      { k: 'fecha',       l: 'Fecha' },
+    { k: 'pacienteId', l: 'Paciente' }, { k: 'medicoId', l: 'Médico' },
+    { k: 'diagnostico', l: 'Diagnóstico' }, { k: 'gravedad', l: 'Gravedad' },
+    { k: 'fecha', l: 'Fecha' }
   ],
   medicamentos: [
-    { k: 'nombre',      l: 'Nombre' },
-    { k: 'dosis',       l: 'Dosis' },
-    { k: 'frecuencia',  l: 'Frecuencia' },
-    { k: 'duracion',    l: 'Duración' },
-    { k: 'tratamiento', l: 'Tratamiento' },
-    { k: 'proveedor',   l: 'Proveedor' },
+    { k: 'nombre', l: 'Nombre' }, { k: 'dosis', l: 'Dosis' },
+    { k: 'frecuencia', l: 'Frecuencia' }, { k: 'duracion', l: 'Duración' },
+    { k: 'tratamientoId', l: 'Tratamiento' }, { k: 'proveedor', l: 'Proveedor' },
+    { k: 'efectos_secundarios', l: 'Efectos secundarios' }
   ],
   tratamientos: [
-    { k: 'nombre',      l: 'Nombre' },
-    { k: 'paciente',    l: 'Paciente' },
-    { k: 'medico',      l: 'Médico' },
-    { k: 'duracion',    l: 'Duración' },
-    { k: 'estado',      l: 'Estado' },
-    { k: 'descripcion', l: 'Descripción' },
+    { k: 'nombre', l: 'Nombre' }, { k: 'diagnosticoId', l: 'Diagnóstico' },
+    { k: 'medicoId', l: 'Médico' }, { k: 'duracion', l: 'Duración' },
+    { k: 'estado', l: 'Estado' }, { k: 'descripcion', l: 'Descripción' },
+    { k: 'frecuencia_administracion', l: 'Frecuencia' }
   ],
 };
 
 function resolveVal(entity, field, val) {
-  // Relaciones: resolver nombre desde db
-  if (field === 'pacienteId') {
-    return db.pacientes.find(p => p.id === val)?.nombre ?? '—';
-  }
+  if (field === 'pacienteId') return db.pacientes.find(p => p.id === val)?.nombre ?? '—';
   if (field === 'medicoId') {
     const m = db.medicos.find(m => m.id === val);
     return m ? `${m.nombre ?? ''} ${m.apellido ?? ''}`.trim() : '—';
   }
-
-  // Badges de estado
+  if (field === 'diagnosticoId') {
+    const d = db.diagnosticos.find(d => d.id === val);
+    return d ? (d.diagnostico || d.descripcion) : '—';
+  }
+  if (field === 'tratamientoId') {
+    const t = db.tratamientos.find(t => t.id === val);
+    return t ? t.nombre : '—';
+  }
   if (field === 'estado') {
-    const map = {
-      activo:     'badge-active',
-      pendiente:  'badge-pending',
-      finalizado: 'badge-done',
-      cancelado:  'badge-cancel',
-      suspendido: 'badge-cancel',
-    };
-    const key  = (val ?? '').toLowerCase();
-    const cls  = map[key] ?? 'badge-pending';
+    const map = { activo: 'badge-active', pendiente: 'badge-pending', finalizado: 'badge-done', cancelado: 'badge-cancel' };
+    const key = (val ?? '').toLowerCase();
+    const cls = map[key] ?? 'badge-pending';
     const label = val ? val.charAt(0).toUpperCase() + val.slice(1) : 'Pendiente';
     return `<span class="badge ${cls}">${label}</span>`;
   }
-
   if (field === 'gravedad') {
-    const map = {
-        'leve':     'badge-active',
-        'moderado': 'badge-pending',
-        'severo':   'badge-cancel',
-    };
+    const map = { leve: 'badge-active', moderado: 'badge-pending', severo: 'badge-cancel', crítico: 'badge-cancel' };
     const key = (val ?? '').toLowerCase();
     const cls = map[key] ?? 'badge-done';
-    return val
-        ? `<span class="badge ${cls}">${val}</span>`
-        : '<span style="color:var(--pearl-400)">—</span>';
-}
-
-  // Precios / costos
-  if (['precio', 'costo'].includes(field)) {
-    return `S/ ${parseFloat(val ?? 0).toFixed(2)}`;
+    return val ? `<span class="badge ${cls}">${val}</span>` : '<span style="color:var(--pearl-400)">—</span>';
   }
-
-  if (['paciente', 'medico', 'diagnostico'].includes(field)) {
-    return val ?? '—';
-  }
-
   return val ?? '—';
 }
 
 // ════════════════════════════════════════════════════════════════
-// RENDER DATA TABLE
+// RENDER TABLE
 // ════════════════════════════════════════════════════════════════
 function renderTable(entity) {
   let data = [...db[entity]];
@@ -1459,7 +1813,7 @@ function renderTable(entity) {
         <button class="action-btn" onclick="openModal('${entity}',${row.id})" title="Editar"><i class="fas fa-pen"></i></button>
         <button class="action-btn delete" onclick="deleteRec('${entity}',${row.id})" title="Eliminar"><i class="fas fa-trash"></i></button>
       </div></td>
-    </tr>`;aaa
+    </tr>`;
   }).join('');
 
   const emptyRow = `<tr><td colspan="${fields.length + 1}"><div class="table-empty">
@@ -1502,81 +1856,349 @@ function renderModule() {
 }
 
 // ════════════════════════════════════════════════════════════════
-// MODAL
+// FUNCIONES AUXILIARES (compartidas)
+// ════════════════════════════════════════════════════════════════
+function esc(v) { return (v || '').toString().replace(/"/g, '&quot;'); }
+function formatPhone(input) {
+  let v = input.value.replace(/\D/g, '').slice(0, 9);
+  if (v.length > 6) v = v.slice(0,3) + ' ' + v.slice(3,6) + ' ' + v.slice(6);
+  else if (v.length > 3) v = v.slice(0,3) + ' ' + v.slice(3);
+  input.value = v;
+}
+function calcAge(dateStr) {
+  const birth = new Date(dateStr);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+function onBirthDateChange(val) {
+  const badge = document.getElementById('ageBadge');
+  if (!badge) return;
+  if (!val) { badge.style.display = 'none'; return; }
+  const age = calcAge(val);
+  if (age >= 0 && age < 130) {
+    badge.innerHTML = `<i class="fas fa-birthday-cake"></i> ${age} años`;
+    badge.className = 'age-badge visible';
+    badge.style.display = '';
+  } else badge.style.display = 'none';
+}
+function selectGender(val) {
+  document.getElementById('ff_genero').value = val;
+  document.querySelectorAll('.gender-option').forEach(btn => {
+    btn.classList.toggle('selected', btn.textContent.trim() === val);
+  });
+}
+function selectBlood(val) {
+  const hidden = document.getElementById('ff_tipo_sangre');
+  if (hidden.value === val) {
+    hidden.value = '';
+    document.querySelectorAll('.blood-chip').forEach(c => c.classList.remove('selected'));
+  } else {
+    hidden.value = val;
+    document.querySelectorAll('.blood-chip').forEach(c => {
+      c.classList.toggle('selected', c.textContent === val);
+    });
+  }
+}
+function selectMedicoExp(btn) {
+  document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const hidden = document.getElementById('ff_años_experiencia');
+  const custom = document.getElementById('expCustom');
+  hidden.value = btn.dataset.value;
+  if (btn.dataset.value === '20+') custom.style.display = 'block';
+  else { custom.style.display = 'none'; custom.value = ''; }
+}
+function selectSeverity(el) {
+  document.querySelectorAll('.severity-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('ff_gravedad').value = el.dataset.value;
+}
+
+// Al hacer UN CLIC: Selecciona el rango de años y oculta la barra (salvo si es '20')
+function selectMedicoExp(button) {
+  // Quitamos la selección a todos los demás botones
+  document.querySelectorAll('.exp-btn').forEach(btn => btn.classList.remove('selected'));
+
+  // Marcamos el botón actual
+  button.classList.add('selected');
+
+  const val = button.getAttribute('data-value');
+  document.getElementById('ff_años_experiencia').value = val;
+
+  const customInput = document.getElementById('expCustom');
+  if (val === '20') {
+    customInput.style.display = 'block';
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = ''; // Limpiamos el valor exacto si cambia a un rango
+  }
+}
+
+// Al hacer DOBLE CLIC: Desmarca el rango y abre la barra para escribir el número exacto (ej. 2)
+function deselectMedicoExp(button) {
+  // Quitamos la marca visual del botón
+  button.classList.remove('selected');
+
+  // Reseteamos el valor oculto general
+  document.getElementById('ff_años_experiencia').value = '';
+
+  // Mostramos la barra para que digite el número personalizado
+  const customInput = document.getElementById('expCustom');
+  customInput.style.display = 'block';
+  customInput.focus(); // Coloca el cursor automáticamente en la barra
+}
+
+
+
+// ════════════════════════════════════════════════════════════════
+// FORMULARIOS
+// ════════════════════════════════════════════════════════════════
+function buildPacienteForm(record) {
+  const r = record || {};
+  const genero = r.genero || '';
+  const sangre = r.tipo_sangre || '';
+  const generos = [
+    { v: 'Masculino', icon: 'fas fa-mars', label: 'Masculino' },
+    { v: 'Femenino', icon: 'fas fa-venus', label: 'Femenino' },
+    { v: 'Otro', icon: 'fas fa-genderless', label: 'Otro' }
+  ];
+  const genderBtns = generos.map(g => `<button type="button" class="gender-option ${genero === g.v ? 'selected' : ''}" onclick="selectGender('${g.v}')"><i class="${g.icon}"></i>${g.label}</button>`).join('');
+  const bloods = ['A+','A-','B+','B-','AB+','AB-','O+','O-'];
+  const bloodChips = bloods.map(b => `<div class="blood-chip ${sangre === b ? 'selected' : ''}" onclick="selectBlood('${b}')">${b}</div>`).join('');
+  let ageHtml = '';
+  if (r.fecha_nacimiento) {
+    const age = calcAge(r.fecha_nacimiento);
+    ageHtml = `<span class="age-badge visible" id="ageBadge"><i class="fas fa-birthday-cake"></i> ${age} años</span>`;
+  } else ageHtml = `<span class="age-badge" id="ageBadge" style="display:none"></span>`;
+  return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nombre <span style="color:#e11d48">*</span></label><input id="ff_nombre" type="text" class="form-input" value="${esc(r.nombre)}" placeholder="Ej. María" required></div>
+      <div class="form-group"><label class="form-label">Apellido</label><input id="ff_apellido" type="text" class="form-input" value="${esc(r.apellido)}" placeholder="Ej. García López"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Fecha de nacimiento</label><input id="ff_fecha_nacimiento" type="date" class="form-input" value="${r.fecha_nacimiento || ''}" max="${new Date().toISOString().slice(0,10)}" onchange="onBirthDateChange(this.value)">${ageHtml}</div>
+      <div class="form-group"><label class="form-label">Teléfono</label><div class="phone-wrap"><span class="phone-prefix">+51</span><input id="ff_telefono" type="tel" class="form-input" value="${esc(r.telefono)}" placeholder="999 999 999" maxlength="12" oninput="formatPhone(this)"></div></div>
+    </div>
+    <div class="form-group"><label class="form-label">Género</label><div class="gender-selector">${genderBtns}</div><input type="hidden" id="ff_genero" value="${esc(genero)}"></div>
+    <div class="form-group"><label class="form-label">Tipo de sangre</label><div class="blood-grid">${bloodChips}</div><input type="hidden" id="ff_tipo_sangre" value="${esc(sangre)}"></div>
+    <div class="form-group"><label class="form-label">Dirección</label><input id="ff_direccion" type="text" class="form-input" value="${esc(r.direccion)}" placeholder="Av. Los Pinos 123, San Isidro..."></div>
+  `;
+}
+
+function buildMedicoForm(record) {
+  const r = record || {};
+  const expValue = r.años_experiencia || '';
+  const expOptions = [
+    { value: '1-3', label: '1-3 años' }, { value: '4-7', label: '4-7 años' },
+    { value: '8-12', label: '8-12 años' }, { value: '13-19', label: '13-19 años' },
+    { value: '20', label: '20 años a mas' }
+  ];
+  //ondblclick
+  const expButtons = expOptions.map(opt => `
+    <button type="button"
+            class="exp-btn ${expValue === opt.value ? 'selected' : ''}"
+            data-value="${opt.value}"
+            onclick="selectMedicoExp(this)"
+            ondblclick="deselectMedicoExp(this)">
+      ${opt.label}
+    </button>
+  `).join('');
+
+  return `
+    <div class="form-row"><div class="form-group"><label class="form-label">Nombre *</label><input id="ff_nombre" class="form-input" value="${esc(r.nombre)}" required></div>
+    <div class="form-group"><label class="form-label">Apellido</label><input id="ff_apellido" class="form-input" value="${esc(r.apellido)}"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Especialidad *</label><input id="ff_especialidad" class="form-input" value="${esc(r.especialidad)}" required></div>
+    <div class="form-group"><label class="form-label">Teléfono</label><div class="phone-wrap"><span class="phone-prefix">+51</span><input id="ff_telefono" class="form-input" value="${esc(r.telefono)}" maxlength="12" oninput="formatPhone(this)"></div></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Email</label><input id="ff_email" type="email" class="form-input" value="${esc(r.email)}"></div>
+    <div class="form-group"><label class="form-label">Licencia</label><input id="ff_licencia" class="form-input" value="${esc(r.licencia)}"></div></div>
+    <div class="form-group"><label class="form-label">Años de experiencia</label><div class="exp-selector">${expButtons}</div>
+    <input type="hidden" id="ff_años_experiencia" value="${esc(expValue)}">
+    <input type="number" id="expCustom" class="form-input" style="margin-top:.6rem; display:${expValue === '20' ? 'block' : 'true'};" placeholder="Escribe años exactos..."></div>
+  `;
+}
+
+function buildCitaForm(record) {
+  const r = record || {};
+  const pacientesOpts = db.pacientes.map(p => `<option value="${p.id}" ${r.pacienteId === p.id ? 'selected' : ''}>${p.nombre} ${p.apellido || ''}</option>`).join('');
+  const medicosOpts = db.medicos.map(m => `<option value="${m.id}" ${r.medicoId === m.id ? 'selected' : ''}>${m.nombre} ${m.apellido || ''}</option>`).join('');
+  const estados = ['pendiente', 'activo', 'finalizado', 'cancelado'];
+  const estadoRadios = estados.map(e => `
+<label class="radio-label ${r.estado === e ? 'selected' : ''}"
+       onclick="
+         document.getElementById('ff_estado').value='${e}';
+         document.querySelectorAll('.radio-label').forEach(x=>x.classList.remove('selected'));
+         this.classList.add('selected');
+       ">
+    <input type="radio"
+           name="estado_radio"
+           value="${e}"
+           ${r.estado === e ? 'checked' : ''}>
+    <span>${e.charAt(0).toUpperCase() + e.slice(1)}</span>
+</label>
+`).join('');
+  return `
+    <div class="form-row"><div class="form-group"><label class="form-label">Paciente *</label><select id="ff_pacienteId" class="form-select" required><option value="">Seleccionar...</option>${pacientesOpts}</select></div>
+    <div class="form-group"><label class="form-label">Médico *</label><select id="ff_medicoId" class="form-select" required><option value="">Seleccionar...</option>${medicosOpts}</select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Fecha *</label><input id="ff_fecha" type="date" class="form-input" value="${r.fecha || ''}" min="${new Date().toISOString().slice(0,10)}" required></div>
+    <div class="form-group"><label class="form-label">Hora *</label><input id="ff_hora" type="time" class="form-input" value="${r.hora || '09:00'}" step="60" required></div></div>
+    <div class="form-group"><label class="form-label">Motivo</label><input id="ff_motivo" class="form-input" value="${esc(r.motivo)}"></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Sala</label><input id="ff_sala" class="form-input" value="${esc(r.sala)}"></div>
+    <div class="form-group"><label class="form-label">Estado</label><div class="radio-group">${estadoRadios}</div><input type="hidden" id="ff_estado" value="${r.estado || 'pendiente'}"></div></div>
+  `;
+}
+
+function buildDiagnosticoForm(record) {
+  const r = record || {};
+  const pacientesOpts = db.pacientes.map(p => `<option value="${p.id}" ${r.pacienteId === p.id ? 'selected' : ''}>${p.nombre} ${p.apellido || ''}</option>`).join('');
+  const medicosOpts = db.medicos.map(m => `<option value="${m.id}" ${r.medicoId === m.id ? 'selected' : ''}>${m.nombre} ${m.apellido || ''}</option>`).join('');
+  const gravedades = ['Leve', 'Moderado', 'Severo', 'Crítico'];
+  const gravedadChips = gravedades.map(g => `<div class="severity-chip ${r.gravedad === g ? 'selected' : ''}" data-value="${g}" onclick="selectSeverity(this)">${g}</div>`).join('');
+  return `
+    <div class="form-row"><div class="form-group"><label class="form-label">Paciente *</label><select id="ff_pacienteId" class="form-select" required><option value="">Seleccionar...</option>${pacientesOpts}</select></div>
+    <div class="form-group"><label class="form-label">Médico</label><select id="ff_medicoId" class="form-select"><option value="">Seleccionar...</option>${medicosOpts}</select></div></div>
+    <div class="form-group"><label class="form-label">Diagnóstico *</label><input id="ff_diagnostico" class="form-input" value="${esc(r.diagnostico)}" required></div>
+    <div class="form-group"><label class="form-label">Gravedad</label><div class="severity-group">${gravedadChips}</div><input type="hidden" id="ff_gravedad" value="${esc(r.gravedad)}"></div>
+    <div class="form-group"><label class="form-label">Fecha</label><input id="ff_fecha" type="date" class="form-input" value="${r.fecha || new Date().toISOString().slice(0,10)}"></div>
+  `;
+}
+
+function buildTratamientoForm(record) {
+  const r = record || {};
+  const diagnosticosOpts = db.diagnosticos.map(d => `<option value="${d.id}" ${r.diagnosticoId === d.id ? 'selected' : ''}>${d.diagnostico || d.descripcion} (${db.pacientes.find(p => p.id === d.pacienteId)?.nombre || '?'})</option>`).join('');
+  const medicosOpts = db.medicos.map(m => `<option value="${m.id}" ${r.medicoId === m.id ? 'selected' : ''}>${m.nombre} ${m.apellido || ''}</option>`).join('');
+  const estados = ['Activo', 'Finalizado', 'Suspendido'];
+  const estadoRadios = estados.map(e => `
+    <label class="radio-label ${r.estado === e ? 'selected' : ''}"
+           onclick="
+               document.getElementById('ff_estado').value='${e}';
+               document.querySelectorAll('#modalBody .radio-label').forEach(l => l.classList.remove('selected'));
+               this.classList.add('selected');
+           ">
+        <input type="radio" name="estado_radio" value="${e}" ${r.estado === e ? 'checked' : ''} style="display: none;">
+        <span>${e}</span>
+    </label>
+`).join('');
+  return `
+    <div class="form-row"><div class="form-group"><label class="form-label">Nombre *</label><input id="ff_nombre" class="form-input" value="${esc(r.nombre)}" required></div>
+    <div class="form-group"><label class="form-label">Duración *</label><input id="ff_duracion" class="form-input" value="${esc(r.duracion)}" required></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Diagnóstico asociado *</label><select id="ff_diagnosticoId" class="form-select" required><option value="">Seleccionar...</option>${diagnosticosOpts}</select></div>
+    <div class="form-group"><label class="form-label">Médico a cargo *</label><select id="ff_medicoId" class="form-select" required><option value="">Seleccionar...</option>${medicosOpts}</select></div></div>
+    <div class="form-group"><label class="form-label">Descripción *</label><textarea id="ff_descripcion" class="form-textarea" rows="3" required>${esc(r.descripcion)}</textarea></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Estado</label><div class="radio-group">${estadoRadios}</div><input type="hidden" id="ff_estado" value="${r.estado || 'Activo'}"></div>
+    <div class="form-group"><label class="form-label">Frecuencia administración</label><input id="ff_frecuencia_administracion" class="form-input" value="${esc(r.frecuencia_administracion)}"></div></div>
+  `;
+}
+
+function buildMedicamentoForm(record) {
+  const r = record || {};
+  const tratamientosOpts = db.tratamientos.map(t => `<option value="${t.id}" ${r.tratamientoId === t.id ? 'selected' : ''}>${t.nombre} (${db.diagnosticos.find(d => d.id === t.diagnosticoId)?.diagnostico || '?'})</option>`).join('');
+  return `
+    <div class="form-row"><div class="form-group"><label class="form-label">Nombre *</label><input id="ff_nombre" class="form-input" value="${esc(r.nombre)}" required></div>
+    <div class="form-group"><label class="form-label">Dosis *</label><input id="ff_dosis" class="form-input" value="${esc(r.dosis)}" required></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Frecuencia *</label><input id="ff_frecuencia" class="form-input" value="${esc(r.frecuencia)}" required></div>
+    <div class="form-group"><label class="form-label">Duración *</label><input id="ff_duracion" class="form-input" value="${esc(r.duracion)}" required></div></div>
+    <div class="form-group"><label class="form-label">Tratamiento asociado *</label><select id="ff_tratamientoId" class="form-select" required><option value="">Seleccionar...</option>${tratamientosOpts}</select></div>
+    <div class="form-group"><label class="form-label">Proveedor</label><input id="ff_proveedor" class="form-input" value="${esc(r.proveedor)}"></div>
+    <div class="form-group"><label class="form-label">Efectos secundarios</label><textarea id="ff_efectos_secundarios" class="form-textarea" rows="2">${esc(r.efectos_secundarios)}</textarea></div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODAL Y SAVE
 // ════════════════════════════════════════════════════════════════
 function openModal(entity, id) {
   const record = id ? db[entity].find(r => r.id === id) : null;
-  const fields = FIELDS[entity];
-  document.getElementById('modalTitle').textContent = `${id ? 'Editar' : 'Nuevo'} ${MODULE_META[entity]?.title || entity}`;
-
   let formHtml = '';
-  const rows = [];
-  for (let i = 0; i < fields.length; i += 2) {
-    const f1 = fields[i], f2 = fields[i + 1];
-    rows.push(`<div class="${f2 ? 'form-row' : ''}">
-      ${buildField(f1, record)}
-      ${f2 ? buildField(f2, record) : ''}
-    </div>`);
-  }
-  formHtml = rows.join('');
+  if (entity === 'pacientes') formHtml = buildPacienteForm(record);
+  else if (entity === 'medicos') formHtml = buildMedicoForm(record);
+  else if (entity === 'citas') formHtml = buildCitaForm(record);
+  else if (entity === 'diagnosticos') formHtml = buildDiagnosticoForm(record);
+  else if (entity === 'tratamientos') formHtml = buildTratamientoForm(record);
+  else if (entity === 'medicamentos') formHtml = buildMedicamentoForm(record);
   document.getElementById('modalBody').innerHTML = formHtml;
-
+  document.getElementById('modalTitle').textContent = `${id ? 'Editar' : 'Nuevo'} ${MODULE_META[entity]?.title || entity}`;
   pendingModalSave = () => saveRecord(entity, id);
   document.getElementById('modalOverlay').classList.add('active');
 }
 
-function buildField(f, record) {
-  const val = record ? record[f.k] : '';
-  if (f.k === 'pacienteId') {
-    const opts = db.pacientes.map(p => `<option value="${p.id}" ${record && record.pacienteId === p.id ? 'selected' : ''}>${p.nombre}</option>`).join('');
-    return `<div class="form-group"><label class="form-label">${f.l}</label><select id="ff_${f.k}" class="form-select"><option value="">Seleccionar...</option>${opts}</select></div>`;
-  }
-  if (f.k === 'medicoId') {
-    const opts = db.medicos.map(m => `<option value="${m.id}" ${record && record.medicoId === m.id ? 'selected' : ''}>${m.nombre}</option>`).join('');
-    return `<div class="form-group"><label class="form-label">${f.l}</label><select id="ff_${f.k}" class="form-select"><option value="">Seleccionar...</option>${opts}</select></div>`;
-  }
-  if (f.k === 'estado') {
-    const opts = ['activo','pendiente','finalizado','cancelado'].map(s => `<option value="${s}" ${val === s ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('');
-    return `<div class="form-group"><label class="form-label">${f.l}</label><select id="ff_${f.k}" class="form-select">${opts}</select></div>`;
-  }
-  const type = f.k === 'fecha' || f.k === 'fechaInicio' ? 'date' :
-               f.k === 'hora' ? 'time' :
-               ['precio','costo','stock','edad'].includes(f.k) ? 'number' : 'text';
-  return `<div class="form-group"><label class="form-label">${f.l}</label><input id="ff_${f.k}" type="${type}" value="${val || ''}" class="form-input" placeholder="${f.l}..." ${type === 'number' ? 'min="0" step="0.01"' : ''}></div>`;
-}
-
 async function saveRecord(entity, id) {
-  const fields = FIELDS[entity];
-  const data = {};
-  for (const f of fields) {
-    const el = document.getElementById(`ff_${f.k}`);
-    if (!el) continue;
-    let v = el.value.trim();
-    if (['precio','costo','stock','edad'].includes(f.k)) v = parseFloat(v) || 0;
-    else if (['pacienteId','medicoId'].includes(f.k)) v = parseInt(v) || 0;
-    data[f.k] = v;
+  let data = {};
+  if (entity === 'pacientes') {
+    ['nombre', 'apellido', 'fecha_nacimiento', 'telefono', 'genero', 'tipo_sangre', 'direccion'].forEach(k => {
+      const el = document.getElementById(`ff_${k}`);
+      if (el) data[k] = el.value.trim();
+    });
+    if (data.telefono) data.telefono = data.telefono.replace(/\s/g, '');
+  } else if (entity === 'medicos') {
+    let exp = document.getElementById('ff_años_experiencia')?.value;
+    const customExp = document.getElementById('expCustom')?.value;
+    if (exp === '20+' && customExp && !isNaN(customExp)) exp = customExp;
+    data = {
+      nombre: document.getElementById('ff_nombre')?.value.trim(),
+      apellido: document.getElementById('ff_apellido')?.value.trim(),
+      especialidad: document.getElementById('ff_especialidad')?.value.trim(),
+      telefono: document.getElementById('ff_telefono')?.value.trim().replace(/\s/g, ''),
+      email: document.getElementById('ff_email')?.value.trim(),
+      licencia: document.getElementById('ff_licencia')?.value.trim(),
+      años_experiencia: exp
+    };
+  } else if (entity === 'citas') {
+    data = {
+      pacienteId: parseInt(document.getElementById('ff_pacienteId')?.value) || 0,
+      medicoId: parseInt(document.getElementById('ff_medicoId')?.value) || 0,
+      fecha: document.getElementById('ff_fecha')?.value,
+      hora: document.getElementById('ff_hora')?.value,
+      motivo: document.getElementById('ff_motivo')?.value.trim(),
+      sala: document.getElementById('ff_sala')?.value.trim(),
+      estado: document.getElementById('ff_estado')?.value
+    };
+  } else if (entity === 'diagnosticos') {
+    data = {
+      pacienteId: parseInt(document.getElementById('ff_pacienteId')?.value) || 0,
+      medicoId: parseInt(document.getElementById('ff_medicoId')?.value) || 0,
+      diagnostico: document.getElementById('ff_diagnostico')?.value.trim(),
+      gravedad: document.getElementById('ff_gravedad')?.value,
+      fecha: document.getElementById('ff_fecha')?.value
+    };
+  } else if (entity === 'tratamientos') {
+    data = {
+      nombre: document.getElementById('ff_nombre')?.value.trim(),
+      duracion: document.getElementById('ff_duracion')?.value.trim(),
+      diagnosticoId: parseInt(document.getElementById('ff_diagnosticoId')?.value) || 0,
+      medicoId: parseInt(document.getElementById('ff_medicoId')?.value) || 0,
+      descripcion: document.getElementById('ff_descripcion')?.value.trim(),
+      estado: document.getElementById('ff_estado')?.value,
+      frecuencia_administracion: document.getElementById('ff_frecuencia_administracion')?.value.trim()
+    };
+  } else if (entity === 'medicamentos') {
+    data = {
+      nombre: document.getElementById('ff_nombre')?.value.trim(),
+      dosis: document.getElementById('ff_dosis')?.value.trim(),
+      frecuencia: document.getElementById('ff_frecuencia')?.value.trim(),
+      duracion: document.getElementById('ff_duracion')?.value.trim(),
+      tratamientoId: parseInt(document.getElementById('ff_tratamientoId')?.value) || 0,
+      proveedor: document.getElementById('ff_proveedor')?.value.trim(),
+      efectos_secundarios: document.getElementById('ff_efectos_secundarios')?.value.trim()
+    };
   }
-
   try {
     if (id) {
-      // Actualizar existente
       const updated = await saveRecordToServer(entity, { ...data, id }, false);
       const idx = db[entity].findIndex(r => r.id === id);
       if (idx >= 0) db[entity][idx] = updated;
       toast('Registro actualizado correctamente');
     } else {
-      // Crear nuevo
       const created = await saveRecordToServer(entity, data, true);
       db[entity].push(created);
-      nextIds[entity] = Math.max(nextIds[entity], created.id + 1);
       toast('Registro creado exitosamente');
     }
     closeModal();
     renderModule();
     updateBadges();
-  } catch (error) {
-    // El error ya fue mostrado en saveRecordToServer
-  }
+  } catch (error) { toast('Error al guardar', 'error'); }
 }
 
 function closeModal() {
@@ -1585,72 +2207,155 @@ function closeModal() {
 }
 
 async function deleteRec(entity, id) {
-  // Validaciones de integridad (pueden moverse al backend)
-  if (entity === 'pacientes') {
-    if (db.citas.some(c => c.pacienteId === id) || db.diagnosticos.some(d => d.pacienteId === id) || db.tratamientos.some(t => t.pacienteId === id)) {
-      toast('Paciente con registros activos, no se puede eliminar', 'error'); return;
-    }
+  if (entity === 'pacientes' && (db.citas.some(c => c.pacienteId === id) || db.diagnosticos.some(d => d.pacienteId === id))) {
+    toast('Paciente con registros activos, no se puede eliminar', 'error');
+    return;
   }
-  if (entity === 'medicos') {
-    if (db.citas.some(c => c.medicoId === id) || db.diagnosticos.some(d => d.medicoId === id)) {
-      toast('Médico con citas asignadas, no se puede eliminar', 'error'); return;
-    }
+  if (entity === 'medicos' && (db.citas.some(c => c.medicoId === id) || db.diagnosticos.some(d => d.medicoId === id))) {
+    toast('Médico con citas asignadas, no se puede eliminar', 'error');
+    return;
   }
-
   if (!confirm('¿Deseas eliminar este registro?')) return;
-
   try {
     await deleteRecordFromServer(entity, id);
     db[entity] = db[entity].filter(r => r.id !== id);
     renderModule();
     updateBadges();
     toast('Registro eliminado');
-  } catch (error) {
-    // Error ya mostrado
-  }
+  } catch (error) { toast('Error al eliminar', 'error'); }
 }
 
 function updateBadges() {
-  ['pacientes','medicos','citas'].forEach(k => {
+  ['pacientes', 'medicos', 'citas'].forEach(k => {
     const el = document.getElementById('badge' + capitalize(k));
     if (el) el.textContent = db[k].length;
   });
 }
 
 // ════════════════════════════════════════════════════════════════
+// BUSCADOR GLOBAL
+// ════════════════════════════════════════════════════════════════
+(function() {
+  const MODULES = [
+    { id:'inicio', label:'Panel Principal', icon:'fa-chart-pie', cls:'mod', sub:'Vista general del sistema' },
+    { id:'pacientes', label:'Pacientes', icon:'fa-users', cls:'pac', sub:'Gestión de pacientes activos' },
+    { id:'medicos', label:'Médicos', icon:'fa-user-md', cls:'med', sub:'Especialistas registrados' },
+    { id:'citas', label:'Citas', icon:'fa-calendar-check', cls:'cit', sub:'Agenda de citas' },
+    { id:'diagnosticos', label:'Diagnósticos', icon:'fa-stethoscope', cls:'diag', sub:'Historial de diagnósticos' },
+    { id:'tratamientos', label:'Tratamientos', icon:'fa-notes-medical', cls:'trat', sub:'Tratamientos activos' },
+    { id:'medicamentos', label:'Medicamentos', icon:'fa-capsules', cls:'medi', sub:'Stock de medicamentos' }
+  ];
+  const REC_CONFIG = {
+    pacientes: { icon:'fa-user', cls:'pac', label: r => r.nombre, sub: r => r.email || r.telefono || '' },
+    medicos: { icon:'fa-stethoscope', cls:'med', label: r => r.nombre, sub: r => r.especialidad || '' },
+    citas: { icon:'fa-calendar', cls:'cit', label: r => { const p = db.pacientes?.find(x=>x.id===r.pacienteId); return p ? `Cita · ${p.nombre}` : `Cita #${r.id}`; }, sub: r => r.fecha || '' },
+    diagnosticos: { icon:'fa-file-medical', cls:'diag', label: r => r.diagnostico || r.descripcion || `Diagnóstico #${r.id}`, sub: r => { const p = db.pacientes?.find(x=>x.id===r.pacienteId); return p ? p.nombre : ''; } },
+    tratamientos: { icon:'fa-pills', cls:'trat', label: r => r.nombre || `Tratamiento #${r.id}`, sub: r => { const d = db.diagnosticos?.find(x=>x.id===r.diagnosticoId); return d ? (d.diagnostico||'') : ''; } },
+    medicamentos: { icon:'fa-capsules', cls:'medi', label: r => r.nombre, sub: r => `Dosis: ${r.dosis || '—'}` }
+  };
+  let kbdIdx = -1, allItems = [];
+  const input = document.getElementById('globalSearch');
+  const drop = document.getElementById('searchDropdown');
+  const wrap = document.getElementById('searchWrapper');
+  function show() { drop.style.display = 'block'; }
+  function hide() { drop.style.display = 'none'; kbdIdx = -1; }
+  function highlight(text, q) {
+    if (!q) return text;
+    const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(re, '<mark style="background:#fef9c3;border-radius:2px;padding:0 1px;">$1</mark>');
+  }
+  function buildResults(q) {
+    allItems = [];
+    const sections = [];
+    const ql = q.toLowerCase();
+    const mods = MODULES.filter(m => m.label.toLowerCase().includes(ql) || m.sub.toLowerCase().includes(ql));
+    if (mods.length) {
+      sections.push(`<div class="search-section-label"><i class="fas fa-th-large" style="margin-right:.4rem;"></i>Módulos</div>`);
+      mods.forEach(m => {
+        const idx = allItems.length;
+        allItems.push({ type:'module', id: m.id });
+        sections.push(`<div class="search-result-item" data-idx="${idx}"><div class="search-result-icon ${m.cls}"><i class="fas ${m.icon}"></i></div><div class="search-result-text"><strong>${highlight(m.label, q)}</strong><span>${m.sub}</span></div><span class="search-result-tag">Módulo</span><i class="fas fa-arrow-right search-result-arrow"></i></div>`);
+      });
+    }
+    const entityOrder = ['pacientes','medicos','citas','diagnosticos','tratamientos','medicamentos'];
+    const entityLabels = { pacientes:'Pacientes', medicos:'Médicos', citas:'Citas', diagnosticos:'Diagnósticos', tratamientos:'Tratamientos', medicamentos:'Medicamentos' };
+    entityOrder.forEach(ent => {
+      const cfg = REC_CONFIG[ent];
+      const records = (db[ent] || []).filter(r => {
+        const lbl = cfg.label(r).toLowerCase();
+        const sub = cfg.sub(r).toLowerCase();
+        return lbl.includes(ql) || sub.includes(ql);
+      }).slice(0, 4);
+      if (!records.length) return;
+      sections.push(`<div class="search-section-label"><i class="fas ${cfg.icon}" style="margin-right:.4rem;"></i>${entityLabels[ent]}</div>`);
+      records.forEach(r => {
+        const idx = allItems.length;
+        allItems.push({ type:'record', entity: ent, id: r.id });
+        const lbl = cfg.label(r);
+        const sub = cfg.sub(r);
+        sections.push(`<div class="search-result-item" data-idx="${idx}"><div class="search-result-icon ${cfg.cls}"><i class="fas ${cfg.icon}"></i></div><div class="search-result-text"><strong>${highlight(lbl, q)}</strong>${sub ? `<span>${highlight(sub, q)}</span>` : ''}</div><span class="search-result-tag">#${r.id}</span><i class="fas fa-arrow-right search-result-arrow"></i></div>`);
+      });
+    });
+    if (!sections.length) return `<div class="search-empty"><i class="fas fa-search"></i>Sin resultados para "<strong>${q}</strong>"</div>`;
+    const footer = `<div class="search-footer"><span class="search-footer-hint"><kbd>↑</kbd><kbd>↓</kbd> navegar</span><span class="search-footer-hint"><kbd>↵</kbd> abrir</span><span class="search-footer-hint"><kbd>Esc</kbd> cerrar</span></div>`;
+    return sections.join('') + footer;
+  }
+  function selectItem(idx) {
+    const item = allItems[idx];
+    if (!item) return;
+    if (item.type === 'module') navigate(item.id);
+    else navigate(item.entity);
+    input.value = '';
+    hide();
+  }
+  function updateKbd() {
+    document.querySelectorAll('#searchDropdown .search-result-item').forEach((el,i) => {
+      el.classList.toggle('kbd-focus', i === kbdIdx);
+      if (i === kbdIdx) el.scrollIntoView({ block:'nearest' });
+    });
+  }
+  input.addEventListener('input', e => {
+    const q = e.target.value.trim();
+    currentSearch = q;
+    if (currentModule !== 'inicio') renderTable(currentModule);
+    if (q.length < 1) { hide(); return; }
+    drop.innerHTML = buildResults(q);
+    show();
+    kbdIdx = -1;
+    drop.querySelectorAll('.search-result-item').forEach(el => { el.addEventListener('mousedown', ev => { ev.preventDefault(); selectItem(+el.dataset.idx); }); });
+  });
+  input.addEventListener('keydown', e => {
+    const items = drop.querySelectorAll('.search-result-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); kbdIdx = Math.min(kbdIdx+1, items.length-1); updateKbd(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); kbdIdx = Math.max(kbdIdx-1, 0); updateKbd(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (kbdIdx >= 0) selectItem(kbdIdx); }
+    else if (e.key === 'Escape') { hide(); input.blur(); }
+  });
+  input.addEventListener('focus', () => { if (input.value.trim().length > 0 && allItems.length > 0) show(); });
+  document.addEventListener('mousedown', e => { if (!wrap.contains(e.target)) hide(); });
+})();
+
+// ════════════════════════════════════════════════════════════════
 // INITIALIZATION
 // ════════════════════════════════════════════════════════════════
 async function init() {
   await loadDB();
-
   const userName = "{{ Auth::user()->name ?? Auth::user()->email ?? 'Administrador' }}";
   const initials = userName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('sidebarName').textContent = userName;
   document.getElementById('sidebarAvatar').textContent = initials;
   document.getElementById('splashName').textContent = userName;
   updateBadges();
-
   document.getElementById('modalClose').onclick = closeModal;
   document.getElementById('modalCancel').onclick = closeModal;
   document.getElementById('modalSave').onclick = () => { if (pendingModalSave) pendingModalSave(); };
   document.getElementById('modalOverlay').onclick = (e) => { if (e.target === document.getElementById('modalOverlay')) closeModal(); };
-
-  document.querySelectorAll('.nav-item[data-module]').forEach(n => {
-    n.onclick = () => navigate(n.dataset.module);
-  });
-
-  document.getElementById('globalSearch').addEventListener('input', e => {
-    currentSearch = e.target.value;
-    if (currentModule !== 'inicio') renderTable(currentModule);
-  });
-
+  document.querySelectorAll('.nav-item[data-module]').forEach(n => { n.onclick = () => navigate(n.dataset.module); });
   document.getElementById('logoutBtn').onclick = () => {
-    fetch('{{ route("logout") }}', {
-      method: 'POST',
-      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
-    }).then(() => window.location.href = '/').catch(() => window.location.href = '/');
+    fetch('{{ route("logout") }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } })
+      .then(() => window.location.href = '/').catch(() => window.location.href = '/');
   };
-
   setTimeout(() => {
     document.getElementById('splashScreen').classList.add('fade-out');
     document.getElementById('appShell').style.display = 'flex';
@@ -1659,7 +2364,6 @@ async function init() {
       renderDashboard();
     }, 1200);
   }, 2600);
-
   const bg = document.querySelector('.splash-bg-rings');
   for (let i = 0; i < 18; i++) {
     const d = document.createElement('div');
@@ -1668,7 +2372,6 @@ async function init() {
     bg.appendChild(d);
   }
 }
-
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>

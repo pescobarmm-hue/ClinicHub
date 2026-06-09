@@ -9,7 +9,7 @@ use App\Http\Controllers\CitaController;
 use App\Http\Controllers\DiagnosticoController;
 use App\Http\Controllers\TratamientoController;
 use App\Http\Controllers\MedicamentoController;
-
+use App\Http\Controllers\ChatbotController;
 
 
 Route::get('/', function () {
@@ -59,4 +59,4 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-Route::get('/welcome', fn() => redirect()->route('home'));
+Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
